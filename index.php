@@ -10,17 +10,15 @@ error_reporting(E_ALL);
 
 ob_start();
 include('sys/base/bm.php');
-$bm = new bm();
+$stateful_bm = new stateful_benchmarker();
 
-$bm->start('all');
+$stateful_bm->start('sys::all');
+
 include('sys/base/state.php');
+
 $state = new stateful();
-
-include('meta/bindings.php');
-
 $state->run();
 
-$bm->end('all');
-echo $bm->time('all');
+$stateful_bm->end('sys::all');
 
 ?>

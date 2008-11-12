@@ -9,15 +9,9 @@ class stateful {
 	var $components = array();
 	var $preventTrigger = false;
 	
-	function stateful() {
-		define('OUTPUTDIR', 'output');
-		define('VIEWDIR', OUTPUTDIR.'/views');
-		define('LAYOUTDIR', OUTPUTDIR.'/layouts');
-		define('COMPONENTDIR', 'components');
-	}
-	
 	function run() {
-		global $bm; 
+		global $stateful_bm; 
+		$this->bm =& $stateful_bm;
 		include('sys/base/loader.php');
 		
 		ob_end_clean();
@@ -31,15 +25,27 @@ class stateful {
 		$this->view = new stateful_view();
 		$this->view->useView($this->requestURI);
 		
+		$this->bm->start('sys::binding_time');
+		$this->loader->bindings($this);
+		$this->bm->end('sys::binding_time');
+		
 		if(isset($_POST['formName'])) {
+			$this->bm->start('sys::form_trigger');
 			$this->trigger('submit::'.$_POST['formName']);
+			$this->bm->end('sys::form_trigger');
 		} 
 		
 		if(!$this->preventTrigger) {
+			$this->bm->start('sys::url_trigger');
 			$this->trigger('url::'.$this->requestURI);		
+			$this->bm->end('sys::url_trigger');
 		}
 		
+		$this->bm->start('sys::view_render');
 		$file = $this->view->render();
+		$this->trigger('sys::postRender', $file);
+		$this->bm->end('sys::view_render');
+		
 		echo $file;
 		
 		$_SESSION['prevUrl'] = $this->requestURI;
@@ -66,7 +72,7 @@ class stateful {
 		$this->events[$event][] = $listener;
 	}
 	
-	function trigger($event, $info = array()) {
+	function trigger($event, &$info = array()) {
 		if(isset($this->events[$event])) {
 			foreach($this->events[$event] as $listener) {
 				if($this->preventTrigger) {
