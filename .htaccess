@@ -1,0 +1,8 @@
+RewriteEngine On
+Options +FollowSymLinks
+
+# Prevent the user from hitting any page other than index.php or files inside the public directory.
+RewriteCond %{REQUEST_FILENAME} !(/sys/tools/)
+RewriteCond %{REQUEST_FILENAME} !(/public/)
+
+RewriteRule ^.*$ index.php [NC,QSA]

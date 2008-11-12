@@ -1,0 +1,1 @@
+<p>Cool's index page</p>
