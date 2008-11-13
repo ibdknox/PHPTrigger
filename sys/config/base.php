@@ -4,6 +4,7 @@ define('FOLDER', '');
 define('OUTPUTDIR', 'output');
 define('VIEWDIR', OUTPUTDIR.'/views');
 define('LAYOUTDIR', OUTPUTDIR.'/layouts');
+define('PARTIALSDIR', OUTPUTDIR.'/partials');
 define('COMPONENTDIR', 'components');
 define('BINDINGSDIR', 'bindings');
 define('LIBRARYDIR', 'library');

@@ -60,7 +60,7 @@ class stateful_router {
 		
 	}
 	
-	function redirect($url) {
+	public function redirect($url) {
 		$server = $_SERVER['SERVER_NAME'];
 		header('Location: http://'.$server.$url);
 		exit;

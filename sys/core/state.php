@@ -25,10 +25,13 @@ class stateful {
 	function run() {
 		global $stateful_bm; 
 		$this->bm =& $stateful_bm;
+		
+		$this->bm->start('sys::core_load_time');
 		include( COREDIR . '/loader.php');
 				
 		$this->loader = new stateful_loader();		
 		$this->loader->loadCore();
+		$this->bm->end('sys::core_load_time');
 		
 		//clean the output buffer to prevent any extraneous whitspace from 
 		//screwing up header settings
@@ -52,13 +55,17 @@ class stateful {
 		
 		if(isset($_POST['formName'])) {
 			$this->bm->start('sys::form_trigger');
+			$this->trigger('sys::preFormTrigger');
 			$this->trigger('submit::'.$_POST['formName']);
+			$this->trigger('sys::postFormTrigger');
 			$this->bm->end('sys::form_trigger');
 		} 
 		
 		if(!$this->preventTrigger) {
 			$this->bm->start('sys::url_trigger');
+			$this->trigger('sys::preUrlTrigger');
 			$this->trigger('url::'.$this->requestURI);		
+			$this->trigger('sys::postUrlTrigger');
 			$this->bm->end('sys::url_trigger');
 		}
 		

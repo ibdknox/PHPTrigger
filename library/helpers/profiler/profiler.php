@@ -12,8 +12,10 @@ class profiler {
 	static $queryNum = 0;
 	static $errors = array();
 	static $debug = array();
+	static $info = array();
 
-	/*	logQuery
+	/**
+	 * 	logQuery
 	 *	This function logs any query performed via self::db->query().
 	 *	Records both the start-time of the query and the actual sql executed.
 	 *
@@ -206,6 +208,12 @@ class profiler {
 				foreach(array_keys(self::$marks) as $key) { $values[$key] = self::time($key); }
 				$rep .= self::benchmarkDisplay($values, '#060', 'BENCHMARKS');
 			}	
+			
+			self::$info['post'] = $_POST;
+			self::$info['get'] = $_GET;
+			self::$info['debug'] = self::$debug;
+			//self::$info['marks'] = $markValues;
+			
 
 			/* Queries. */
 			if (count(self::$queries) > 0) {
@@ -238,8 +246,8 @@ class profiler {
 			*/
 			
 			//event stack
-			$rep .= self::benchmarkDisplay($state->bm->events['triggered'], '#099', 'Triggered Events');
 			$rep .= self::benchmarkDisplay($state->bm->events['handled'], '#099', 'Handled Events');
+			$rep .= self::benchmarkDisplay($state->bm->events['triggered'], '#099', 'Triggered');
 			
 
 			$rep .= '</div>';

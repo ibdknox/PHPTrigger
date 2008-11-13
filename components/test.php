@@ -3,7 +3,7 @@
 class test extends component {
 	
 	function test() {
-		parent::component();
+		parent::__construct();
 		//echo 'initializing';
 	}
 	

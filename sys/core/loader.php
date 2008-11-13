@@ -1,17 +1,28 @@
 <?php
 
+/**
+ * 
+ */
 class stateful_loader {
 	
-	function stateful_loader() {
+	public function __construct() {
+		//nothing to do here?
 	}
 	
-	function loadCore() {
+	public function loadCore() {
+		$core_files = array(
+							''
+							);
 		include( COREDIR . '/router.php' );
 		include( COREDIR . '/view.php');
 		include( COREDIR . '/component.php');
 	}
 	
-	function component($name, $lib = false) {
+	public function loadCoreObject($name) {
+		
+	}
+	
+	public function component($name, $lib = false) {
 		
 		$path = COMPONENTDIR."/$name.php";
 		
@@ -25,7 +36,7 @@ class stateful_loader {
 		}
 	}
 	
-	function bindings($state) {
+	public function bindings($state) {
 		foreach (new DirectoryIterator(BINDINGSDIR) as $entry) {
 			if (substr($entry, strlen($entry)-4, 4) == '.php') {
 				require_once( BINDINGSDIR .'/'. $entry );
