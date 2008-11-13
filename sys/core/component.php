@@ -9,6 +9,10 @@ class component {
 		$this->state =& $state;
 	}
 	
+	function get($path, $info = array()) {
+		$this->state->_($path, $info);
+	}
+	
 }
 
 ?>

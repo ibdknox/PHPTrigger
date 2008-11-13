@@ -5,6 +5,10 @@ class stateful_view {
 	var $viewFile = '';
 	var $templateFile = '';
 	
+	function stateful_view($state) {
+		$this->state =& $state;
+	}
+	
 	function render() {
 		if(is_file($this->viewFile)) {
 			ob_start();
@@ -39,9 +43,8 @@ class stateful_view {
 		$this->templateFile = LAYOUTDIR.'/'.$template.'.php';
 	}
 	
-	function _($path, $info = array()) {
-		global $state;
-		return $state->_($path);
+	function get($path, $info = array()) {
+		return $this->state->_($path);
 	}
 	
 }

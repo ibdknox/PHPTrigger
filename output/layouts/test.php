@@ -1,6 +1,7 @@
 <html>
 	<head>
 		<title>this is a test layout</title>
+		<?php echo tag::style('default'); ?>
 	</head>
 	<body>
 		<div>

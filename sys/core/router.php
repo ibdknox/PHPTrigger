@@ -1,7 +1,5 @@
 <?php
 
-define('FOLDER', '');
-
 class stateful_router {
 	
 	function route() {
@@ -27,13 +25,23 @@ class stateful_router {
 			$tok = strtok($requestURI, '/');
 			
 			$actualURI = '';
+			$stop = false;
 			
 			while ($tok !== false) {
-				if(file_exists(VIEWDIR . '/' . $actualURI) || file_exists(VIEWDIR . '/' . $actualURI . '.php')) {
-					$actualURI .= '/'.$tok;
+				
+				if(!$stop) {					
+					if(file_exists(VIEWDIR . '/' . $actualURI . '/' . $tok . '.php')) {
+						$actualURI .= '/'.$tok;
+						$stop = true;
+					} else if (file_exists(VIEWDIR . '/' . $actualURI . '/' . $tok )) {
+						$actualURI .= '/'.$tok;
+					} else {
+						$stop = true;
+					}
 				} else {
 					$segments[] = $tok;
 				}
+				
 				$tok = strtok('/');
 			}
 			
