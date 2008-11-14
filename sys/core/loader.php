@@ -11,15 +11,17 @@ class stateful_loader {
 	
 	public function loadCore() {
 		$core_files = array(
-							''
+							'router',
+							'view',
+							'component'
 							);
-		include( COREDIR . '/router.php' );
-		include( COREDIR . '/view.php');
-		include( COREDIR . '/component.php');
+		foreach($core_files as $file) {
+			$this->loadCoreObject($file);
+		}
 	}
 	
 	public function loadCoreObject($name) {
-		
+		include( COREDIR . "/$name.php" );
 	}
 	
 	public function component($name, $lib = false) {

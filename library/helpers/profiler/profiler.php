@@ -28,16 +28,16 @@ class profiler {
 		return self::$queryNum;
 	}
 
-	/*	failedQuery
-	 *	This function notes a failed query and stores the error message.
+	/**
+	 * This function notes a failed query and stores the error message.
 	 *
-	 *	@author Chris
+	 * @author Chris
 	 */
 	static function failedQuery($error) {
 		self::$queries[self::$queryNum][2] = $error;
 	}
 
-	/*	endQuery
+	/**
 	 *	This function is called after log query to figure out the end time of the query
 	 *	and to increment the number of queries recorded
 	 *
@@ -52,7 +52,7 @@ class profiler {
 		self::$queryNum++;
 	}
 
-	/*	start
+	/**
 	 *	This function creates a new mark in the marks array with the index of $name.
 	 *	It also stores the beginning time in second dimension array.
 	 *
@@ -63,7 +63,7 @@ class profiler {
 		self::$marks[$name][0] = self::microtime_float();
 	}
 
-	/*	end
+	/**
 	 *	This function adds the end time to the mark with key $name
 	 *
 	 *	@param $name = name of the mark
@@ -73,7 +73,7 @@ class profiler {
 		self::$marks[$name][1] = self::microtime_float();
 	}
 
-	/*	time
+	/**
 	 *	This function returns the total time between the start and end of a mark with index $name
 	 *
 	 *	@param $name = name of the mark
@@ -84,12 +84,15 @@ class profiler {
 		return self::$marks[$name][1] - self::$marks[$name][0];
 	}
 	
+	/**
+	 * 
+	 */
 	static function addError($level, $file, $line, $message) {
 		self::$errors[] = array($level, $file, $line, $message);
 	}
 
-	/*	microtime_float
-	 *	This utility function returns the float version of microtime()
+	/**	
+	 *	returns the float version of microtime()
 	 *
 	 *	@return float of current microtime
 	 */
@@ -191,6 +194,10 @@ class profiler {
 		
 		return $state;
 	}
+	
+	static function addToProfile($name, $data = array()) {
+		self::$info[$name] = $data;
+	}
 
 	/**
 	 * @todo add in state machine stuff
@@ -200,58 +207,23 @@ class profiler {
 		$state = self::mergeFromState();
 		
 		if (true) {
-			$rep = '<div style="padding: 2em; clear: both;">';
-
-			/* Time Benchmarks. */
-			if (count(self::$marks) > 0) {
-				$values = array();
-				foreach(array_keys(self::$marks) as $key) { $values[$key] = self::time($key); }
-				$rep .= self::benchmarkDisplay($values, '#060', 'BENCHMARKS');
-			}	
 			
-			self::$info['post'] = $_POST;
-			self::$info['get'] = $_GET;
-			self::$info['debug'] = self::$debug;
-			//self::$info['marks'] = $markValues;
+			self::addToProfile('debug', self::$debug);
 			
-
-			/* Queries. */
-			if (count(self::$queries) > 0) {
-				$rep .= self::benchmarkDisplay(self::$queries, '#009', 'QUERIES');
-			}
+			$markValues = array();
+			foreach(array_keys(self::$marks) as $key) { $markValues[$key] = self::time($key); }	
+			self::addToProfile('benchmarks', $markValues);
 			
-			/* Debug. */
-			if (count(self::$debug) > 0) {
-				$values = array();
-				$rep .= self::benchmarkDisplay(self::$debug, '#288', 'DEBUG');
-			}
-
-			/* $_POST Values. */
-			if (isset($_POST) && count($_POST) > 0) {
-				$rep .= self::benchmarkDisplay($_POST, '#900', '$_POST');
-			}
-
-			/* $_GET Values. */
-			if (isset($_GET) && count($_GET) > 0) {
-				$rep .= self::benchmarkDisplay($_GET, '#909', '$_GET');
-			}
-
-			/* State Machine. */
-			/*
-			if (count(state::$sm) > 0) {
-				$values = array();
-				foreach(state::$sm as $key => $value) { $values[] = array('Var: '.$key, $value); }
-				$rep .= self::benchmarkDisplay($values, '#055', 'STATEMACHINE');
-			}
-			*/
+			self::addToProfile('post', $_POST);
+			self::addToProfile('get', $_GET);
+			self::addToProfile('queries', self::$queries);
 			
-			//event stack
-			$rep .= self::benchmarkDisplay($state->bm->events['handled'], '#099', 'Handled Events');
-			$rep .= self::benchmarkDisplay($state->bm->events['triggered'], '#099', 'Triggered');
+			self::addToProfile('handled', $state->bm->events['handled']);
+			self::addToProfile('triggered', $state->bm->events['triggered']);
 			
+			$profileView = $state->view->partial('profiler', HELPERSDIR.'/profiler/views');
 
-			$rep .= '</div>';
-			$file = str_replace('</body>',$rep."\r\n</body>",$file);
+			$file = str_replace('</body>',$profileView."\r\n</body>",$file);
 		}
 
 		if (true) {
