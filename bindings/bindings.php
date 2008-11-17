@@ -14,6 +14,7 @@ $state->register('submit::login', 'test::event');
 //custom
 $state->register('kaboom', 'test::bombsquad');
 
+//sys
 $state->register('sys::preOutput', 'profiler::addProfileInfo');
 
 ?>

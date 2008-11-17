@@ -5,8 +5,8 @@
  */
 class stateful_loader {
 	
-	public function __construct() {
-		//nothing to do here?
+	public function __construct($state) {
+		$this->state =& $state;
 	}
 	
 	public function loadCore() {
@@ -16,26 +16,28 @@ class stateful_loader {
 							'component'
 							);
 		foreach($core_files as $file) {
-			$this->loadCoreObject($file);
+			$this->state->$file = stateful_load_core_object($file, $this->state);
 		}
+		
+		$this->config('state');
 	}
 	
-	public function loadCoreObject($name) {
-		include( COREDIR . "/$name.php" );
-	}
-	
-	public function component($name, $lib = false) {
+	public function component($name, $path = false) {
 		
-		$path = COMPONENTDIR."/$name.php";
-		
-		if($lib) {
-			$path = LIBCOMPONENTSDIR."/$name.php";
+		if(!$path) {
+			$path = COMPONENTDIR;
 		}
+		
+		$path .= "/$name.php";
 		
 		if(file_exists( $path )) {
 			include( $path );
 			return new $name();
 		}
+	}
+	
+	public function config($configName) {
+		include( CONFIGDIR . "/$configName.php" );
 	}
 	
 	public function bindings($state) {

@@ -7,7 +7,7 @@
  *	@author Chris
  */
 
-class stateful_benchmarker {
+class stateful_bm {
 	
 	public $events = array();
 	public $marks = array(); // Associative array of start and end mark times

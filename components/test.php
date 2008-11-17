@@ -1,6 +1,6 @@
 <?php
 
-class test extends component {
+class test extends stateful_component {
 	
 	function test() {
 		parent::__construct();

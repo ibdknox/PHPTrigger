@@ -15,14 +15,11 @@ include('sys/config/base.php');
 set_error_handler('StatefulErrorHandler');
 set_exception_handler('StatefulExceptionHandler');
 
-include( COREDIR . '/bm.php');
-$stateful_bm = new stateful_benchmarker();
+$stateful_bm = stateful_load_core_object('bm');
 
 $stateful_bm->start('sys::all');
 
-include( COREDIR . '/state.php');
-
-$state = new stateful();
+$state = stateful_load_core_object('state');
 $state->run();
 
 ?>

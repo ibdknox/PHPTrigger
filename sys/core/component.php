@@ -6,7 +6,7 @@
  * @author Chris Granger
  * @copyright Chris Granger 2008
  */
-class component {
+class stateful_component {
 	
 	/**
 	 * reference to the global state object 

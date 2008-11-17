@@ -12,8 +12,22 @@ define('HELPERSDIR', LIBRARYDIR.'/helpers');
 define('LIBCOMPONENTSDIR', LIBRARYDIR.'/components');
 define('EXTENSIONSDIR', LIBRARYDIR.'/extensions');
 define('SYSDIR', 'sys');
+define('CONFIGDIR', SYSDIR.'/config');
 define('COREDIR', SYSDIR.'/core');
 
+function stateful_load_core_object($name, $state = null) {
+	include( COREDIR . "/$name.php" );
+	if(file_exists(EXTENSIONSDIR . "/$name.php")) {
+		include(EXTENSIONSDIR . "/$name.php");
+		$className = $name . '_extension';
+		if(class_exists($className)) {
+			return new $className($state);
+		}
+	}
+	$className = 'stateful_' . $name;
+	var_dump($state);
+	return new $className($state);
+}
 
 /**
  * 

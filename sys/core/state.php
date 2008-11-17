@@ -1,6 +1,6 @@
 <?php
 
-class stateful {
+class stateful_state {
 	
 	const CLASSNAME = 0;
 	const FUNCTIONNAME = 1;
@@ -8,7 +8,7 @@ class stateful {
 	const REQUESTSEGMENTS = 1;
 	
 	var $components = array();
-	var $preventTrigger = false;
+	var $preventTriggers = array();
 	
 	function stateful() {
 		if(isset($_SESSION['stateful::storedPost'])) {
@@ -20,6 +20,8 @@ class stateful {
 			$_GET = unserialize($_SESSION['stateful::storedGet']);
 			unset($_SESSION['stateful::storedGet']);
 		}
+		
+		
 	}
 	
 	function run() {
@@ -29,7 +31,7 @@ class stateful {
 		$this->bm->start('sys::core_load_time');
 		include( COREDIR . '/loader.php');
 				
-		$this->loader = new stateful_loader();		
+		$this->loader = new stateful_loader($this);		
 		$this->loader->loadCore();
 		$this->bm->end('sys::core_load_time');
 		
@@ -37,8 +39,6 @@ class stateful {
 		//screwing up header settings
 		ob_end_clean();
 		
-		//instantiate our router
-		$this->router = new stateful_router();
 		//go ahead and establish our requestURI and uri-segments
 		$routePieces = $this->router->route();
 		//store these
@@ -46,7 +46,6 @@ class stateful {
 		$this->requestSegments = $routePieces[ self::REQUESTSEGMENTS] ;
 		
 		//create a new view object
-		$this->view = new stateful_view($this);
 		$this->view->useView($this->requestURI);
 		
 		$this->bm->start('sys::binding_time');
@@ -61,13 +60,11 @@ class stateful {
 			$this->bm->end('sys::form_trigger');
 		} 
 		
-		if(!$this->preventTrigger) {
-			$this->bm->start('sys::url_trigger');
-			$this->trigger('sys::preUrlTrigger');
-			$this->trigger('url::'.$this->requestURI);		
-			$this->trigger('sys::postUrlTrigger');
-			$this->bm->end('sys::url_trigger');
-		}
+		$this->bm->start('sys::url_trigger');
+		$this->trigger('sys::preUrlTrigger');
+		$this->trigger('url::'.$this->requestURI);		
+		$this->trigger('sys::postUrlTrigger');
+		$this->bm->end('sys::url_trigger');
 		
 		$this->bm->start('sys::view_render');
 		$file = $this->view->render();
@@ -95,14 +92,14 @@ class stateful {
 		$this->router->redirect($_SESSION['stateful::prevUrl']);
 	}
 	
-	function preventTrigger() {
-		$this->preventTrigger = true;
+	function preventTrigger($path = 'all') {
+		$this->preventTriggers[$path] = true;
 	}
 	
 	function _($path, &$info = array(), $returnVal = true) {
 		$parts = $this->parseListener($path);
 		if(!isset($this->components[$parts[self::CLASSNAME]])) {
-			$this->components[$parts[self::CLASSNAME]] = $this->loader->component($parts[self::CLASSNAME]);
+			$this->components[$parts[self::CLASSNAME]] = $this->loader->component($parts[self::CLASSNAME], $parts['dir']);
 		}
 		if(is_callable(array($this->components[$parts[self::CLASSNAME]], $parts[self::FUNCTIONNAME]))) {
 			
@@ -133,24 +130,55 @@ class stateful {
 		$this->events[$event][] = $listener;
 	}
 	
+	function triggerPrevented($eventName) {
+		if(isset($this->preventTriggers['all']) || isset($this->preventTriggers[$eventName])) {
+			return true;
+		}
+		
+		foreach($this->preventTriggers as $name => $value) {
+			if(stripos($eventName, $name) !== false) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	function trigger($event, &$info = array()) {
+		
+		if($this->triggerPrevented($event)) {
+			return;
+		}
+		
 		$this->bm->triggered($event);
 		if(isset($this->events[$event])) {
 			foreach($this->events[$event] as $listener) {
-				if($this->preventTrigger) {
-					break;
-				}
 				
 				if($this->_($listener, $info, false)) {
 					$this->bm->handled($listener, $event);
+				}
+				
+				if($this->triggerPrevented($event)) {
+					return;
 				}
 				
 			}
 		}
 	}
 	
+	function registerComponentPath($pathPart, $directory) {
+		$this->componentPaths[$pathPart] = $directory;
+	}
+	
 	function parseListener($path) {
 		$pieces = explode('::', $path);
+		$piecesCount = count($pieces);
+		if($piecesCount > 2 && isset($this->componentPaths[$pieces[0]])) {
+			$type = array_shift($pieces);
+			$pieces['dir'] = $this->componentPaths[$type];
+		} else {
+			$pieces['dir'] = COMPONENTDIR;
+		}
 		return $pieces;
 	}
 	
