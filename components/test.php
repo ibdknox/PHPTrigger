@@ -8,6 +8,7 @@ class test extends stateful_component {
 	}
 	
 	function event() {
+		$this->get('lib::lib_test::woot');
 		echo 'responding to an event<br/>';
 	}
 	
