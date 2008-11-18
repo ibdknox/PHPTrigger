@@ -1,7 +1,7 @@
 <?php
 
 /**
- * utility to handle clobal configuration concerns for lib components and 
+ * utility to handle global configuration concerns for lib components and 
  * helpers
  * 
  * @author Chris Granger

@@ -1,5 +1,8 @@
 <?php 
 
+config::set('profiler.display', true);
+config::set('profiler.showErrors', true);
+
 //url listeners
 $state->register('url::/index','test::event');
 $state->register('url::/index', 'test::event2');

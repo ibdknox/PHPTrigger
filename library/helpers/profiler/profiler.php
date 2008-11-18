@@ -203,10 +203,12 @@ class profiler {
 	 * @todo add in state machine stuff
 	 */
 	static function addProfileInfo(&$file) {
+		
+		include( HELPERSDIR . '/profiler/config.php' );
 
 		$state = self::mergeFromState();
 		
-		if (true) {
+		if (config::get('profiler.display')) {
 			
 			self::addToProfile('debug', self::$debug);
 			
@@ -226,7 +228,7 @@ class profiler {
 			$file = str_replace('</body>',$profileView."\r\n</body>",$file);
 		}
 
-		if (true) {
+		if (config::get('profiler.showErrors')) {
 			/* Errors. */
 			if (count(self::$errors) > 0) {
 				$rep = '<div style="padding: 2em; clear: both;">';

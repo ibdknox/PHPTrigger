@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<title>this is a test layout</title>
+		<title>this is a test layout - <?php echo isset($title) ? $title : ''; ?></title>
 		<?php echo tag::style('default'); ?>
 	</head>
 	<body>
