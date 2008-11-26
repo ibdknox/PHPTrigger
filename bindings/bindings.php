@@ -3,6 +3,41 @@
 config::set('profiler.display', true);
 config::set('profiler.showErrors', true);
 
+config::set('database.default', array(
+	'benchmark'     => TRUE,
+	'persistent'    => FALSE,
+	'connection'    => array
+	(
+		'type'     => 'mysql',
+		'user'     => 'root',
+		'pass'     => 'root',
+		'host'     => 'localhost',
+		'port'     => FALSE,
+		'socket'   => FALSE,
+		'database' => 'test'
+	),
+	'character_set' => 'utf8',
+	'table_prefix'  => '',
+	'object'        => TRUE,
+	'cache'         => FALSE,
+	'escape'        => TRUE
+));
+
+class Company_Model extends orm {}
+class Project_Model extends orm {}
+
+
+profiler::start('test');
+$comp = ORM::factory('company');
+
+$comp->select('value')->find(1);
+//$comp->find(2);
+
+//$projects = ORM::factory('project');
+//$projects->select('name')->find_all();
+profiler::end('test');
+//var_dump($projects);
+
 //url listeners
 $state->register('url::/index','test::event');
 $state->register('url::/index', 'test::event2');

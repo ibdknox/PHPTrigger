@@ -92,8 +92,8 @@ function StatefulErrorHandler($level, $message, $file, $line) {
  */
 function StatefulExceptionHandler($exception) {
 	
-	
-	profiler::addError('Exception', $exception->getFile(), $exception->getLine(), $exception->getMessage());
+	echo "exception thrown".$exception->getFile().$exception->getLine();
+	//profiler::addError('Exception', $exception->getFile(), $exception->getLine(), $exception->getMessage());
 			
 }
 

@@ -4,10 +4,12 @@ class test extends stateful_component {
 	
 	function test() {
 		parent::__construct();
-		//echo 'initializing';
+
+		$this->agg = '';
 	}
 	
 	function event() {
+		//profiler::debug($this->state);
 		$this->get('lib::lib_test::woot');
 		echo 'responding to an event<br/>';
 	}
@@ -22,11 +24,28 @@ class test extends stateful_component {
 	}
 	
 	function info() {
-		return 'cool';
+		return $this->agg;
 	}
 	
 	function woot() {
-		return array('woot', 'yar', 'cool');
+		$gen = new generator(array('woot', 'yar', 'cool'));
+		$gen->mutate('test::addA');
+		$gen->mutate('test::lowercase');
+		$gen->mutate('test::aggregate');
+		return $gen;
+	}
+	
+	function addA($node) {
+		return $node .= 'A!';
+	}
+	
+	function lowercase($node) {
+		return strtolower($node);
+	}
+	
+	function aggregate($node) {
+		$this->agg .= $node;
+		return $node;
 	}
 	
 }

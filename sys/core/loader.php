@@ -19,7 +19,7 @@ class stateful_loader {
 			$this->state->$file = stateful_load_core_object($file, $this->state);
 		}
 		
-		$this->config('state');
+		$this->config();
 	}
 	
 	public function component($name, $path = false) {
@@ -36,8 +36,12 @@ class stateful_loader {
 		}
 	}
 	
-	public function config($configName) {
-		include( CONFIGDIR . "/$configName.php" );
+	public function config() {
+		foreach (new DirectoryIterator(CONFIGDIR) as $entry) {
+			if (substr($entry, strlen($entry)-4, 4) == '.php' && $entry != 'base.php') {
+				include( CONFIGDIR . "/$entry" );
+			}
+		}
 	}
 	
 	public function bindings($state) {

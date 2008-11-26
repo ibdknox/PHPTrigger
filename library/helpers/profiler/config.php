@@ -12,4 +12,5 @@ config::set('profiler.colors', array(
 									'errors'=> '#900'
 									));
 
+
 ?>

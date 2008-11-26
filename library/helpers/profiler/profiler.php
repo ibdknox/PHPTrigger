@@ -1,6 +1,6 @@
 <?php
 
-/*	CLASS Profiler
+/**
  *	Used to gather time information for the profiler.
  *
  *	@author Chris
