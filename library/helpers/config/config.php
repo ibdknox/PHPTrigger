@@ -64,7 +64,8 @@ class config {
 				$curNode[$p] = array();	
 			} else if(!$nodeExists) {
 				//we're searching and this doesn't exist, return false
-				return false;
+				$temp = false;
+				return $temp;
 			}
 			
 			//set our new curNode

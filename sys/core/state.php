@@ -43,7 +43,7 @@ class stateful_state {
 		$routePieces = $this->router->route();
 		//store these
 		$this->requestURI = $routePieces[ self::REQUESTURI ];
-		$this->requestSegments = $routePieces[ self::REQUESTSEGMENTS] ;
+		$this->requestSegments = $routePieces[ self::REQUESTSEGMENTS ];
 		
 		//create a new view object
 		$this->view->useView($this->requestURI);
@@ -52,18 +52,18 @@ class stateful_state {
 		$this->loader->bindings($this);
 		$this->bm->end('sys::binding_time');
 		
-		if(isset($_POST['formName'])) {
+		if($this->postedForm()) {
 			$this->bm->start('sys::form_trigger');
-			$this->trigger('sys::preFormTrigger');
+			$this->trigger('sys::preForm');
 			$this->trigger('submit::'.$_POST['formName']);
-			$this->trigger('sys::postFormTrigger');
+			$this->trigger('sys::postForm');
 			$this->bm->end('sys::form_trigger');
 		} 
 		
 		$this->bm->start('sys::url_trigger');
-		$this->trigger('sys::preUrlTrigger');
+		$this->trigger('sys::preUrl');
 		$this->trigger('url::'.$this->requestURI);		
-		$this->trigger('sys::postUrlTrigger');
+		$this->trigger('sys::postUrl');
 		$this->bm->end('sys::url_trigger');
 		
 		$this->bm->start('sys::view_render');
@@ -78,6 +78,10 @@ class stateful_state {
 		$this->trigger('sys::preOutput', &$file);
 		echo $file;
 		
+	}
+	
+	public function postedForm() {
+		return isset($_POST['formName']) ? $_POST['formName'] : false;
 	}
 	
 	function segment($num) {
@@ -98,6 +102,7 @@ class stateful_state {
 	
 	function _($path, &$info = array(), $returnVal = true) {
 		$parts = $this->parseListener($path);
+		
 		if(!isset($this->components[$parts[self::CLASSNAME]])) {
 			$this->components[$parts[self::CLASSNAME]] = $this->loader->component($parts[self::CLASSNAME], $parts['dir']);
 		}
@@ -112,8 +117,7 @@ class stateful_state {
 			
 			return true;
 			
-		} else {
-			
+		} else if (is_callable(array($parts[self::CLASSNAME], $parts[self::FUNCTIONNAME]))) {
 			$val = call_user_func(array($parts[self::CLASSNAME], $parts[self::FUNCTIONNAME]), &$info);
 			
 			if($returnVal) {

@@ -29,6 +29,11 @@ function stateful_load_core_object($name, $state = null) {
 	return new $className($state);
 }
 
+function &getStateObject() {
+	global $state;
+	return $state;
+}
+
 /**
  * 
  */
@@ -92,7 +97,7 @@ function StatefulErrorHandler($level, $message, $file, $line) {
  */
 function StatefulExceptionHandler($exception) {
 	
-	echo "exception thrown".$exception->getFile().$exception->getLine();
+	echo "exception thrown".$exception->getFile().$exception->getLine().$exception->getMessage();
 	//profiler::addError('Exception', $exception->getFile(), $exception->getLine(), $exception->getMessage());
 			
 }

@@ -35,6 +35,10 @@ class test extends stateful_component {
 		return $gen;
 	}
 	
+	function validateLogin() {
+		profiler::debug('here');
+	}
+	
 	function addA($node) {
 		return $node .= 'A!';
 	}

@@ -3,6 +3,8 @@
 config::set('profiler.display', true);
 config::set('profiler.showErrors', true);
 
+config::set('validator.form.default', 'validate');
+
 config::set('database.default', array(
 	'benchmark'     => TRUE,
 	'persistent'    => FALSE,
@@ -23,6 +25,7 @@ config::set('database.default', array(
 	'escape'        => TRUE
 ));
 
+/*
 class Company_Model extends orm {}
 class Project_Model extends orm {}
 
@@ -37,6 +40,7 @@ $comp->select('value')->find(1);
 //$projects->select('name')->find_all();
 profiler::end('test');
 //var_dump($projects);
+*/
 
 //url listeners
 $state->register('url::/index','test::event');
@@ -54,5 +58,6 @@ $state->register('kaboom', 'test::bombsquad');
 
 //sys
 $state->register('sys::preOutput', 'profiler::addProfileInfo');
+$state->register('sys::preForm', 'validator::dispatch');
 
 ?>

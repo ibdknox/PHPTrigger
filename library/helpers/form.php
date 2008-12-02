@@ -55,15 +55,10 @@ class form {
 		$attr = form::attributeString($attr);
 		$str = "<select name='$name' id='$name' $attr>\r\n";
 		$postVal = form::forDisp($name);
-		if(is_assoc($values)){
-			foreach($values as $key => $val) {				
-				$str .= "<option value='$key'".($postVal == $key ? 'selected="selected"' : '').">$val</option>";
-			}
-		} else {
-			foreach($values as $val) {
-				$str .= "<option value='$val'".($postVal == $val ? 'selected="selected"' : '').">$val</option>";
-			}
+		foreach($values as $key => $val) {				
+			$str .= "<option value='$key'".($postVal == $key ? 'selected="selected"' : '').">$val</option>";
 		}
+	
 		$str .= "</select>";
 		return $str;
 	}

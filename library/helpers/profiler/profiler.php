@@ -186,7 +186,7 @@ class profiler {
 	}
 	
 	static function mergeFromState() {
-		global $state;
+		$state = getStateObject();
 		
 		foreach($state->bm->marks as $mark => $info) {
 			self::$marks[$mark] = $info;
