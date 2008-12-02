@@ -30,12 +30,15 @@ class stateful_router {
 			while ($tok !== false) {
 				
 				if(!$stop) {					
-					if(file_exists(VIEWDIR . '/' . $actualURI . '/' . $tok . '.php')) {
+					if(file_exists(VIEWDIR . $actualURI . '/' . $tok . '.php')) {
 						$actualURI .= '/'.$tok;
 						$stop = true;
-					} else if (file_exists(VIEWDIR . '/' . $actualURI . '/' . $tok )) {
+						$folder = false;
+					} else if (file_exists(VIEWDIR . $actualURI . '/' . $tok )) {
 						$actualURI .= '/'.$tok;
+						$folder = true;
 					} else {
+						$segments[] = $tok;
 						$stop = true;
 					}
 				} else {
@@ -44,7 +47,7 @@ class stateful_router {
 				
 				$tok = strtok('/');
 			}
-			
+
 			if($actualURI == '') {
 				if(!file_exists(VIEWDIR.'/index.php')) {
 					//TODO error out
@@ -52,6 +55,10 @@ class stateful_router {
 				} else {
 					$actualURI = '/index';
 				}
+			} else if($folder && !empty($segments)) {
+				header("HTTP/1.0 404 Not Found");
+			} else if($folder) {
+				$actualURI .= '/index';
 			}
 			
 			return array($actualURI, $segments);
