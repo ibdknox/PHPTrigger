@@ -46,10 +46,12 @@ profiler::end('test');
 $this->event->register('url::/index','test::event');
 $this->event->register('url::/index', 'test::event2');
 
+/*
 access::restrict('/admin', array(
 								'priv' => 'admin',
 								'revert' => '/'
 							));
+							*/
 
 $this->event->register('url::/cool/test', 'test::event');
 
