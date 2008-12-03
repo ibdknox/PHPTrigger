@@ -2,10 +2,12 @@
 
 class validator {
 	
-	function dispatch() {
+	static $validForm = true;
+	
+	static function dispatch() {
 
-		$state =& getStateObject();
-		$form = $state->postedForm();
+		$event =& geteventObject();
+		$form = $event->postedForm();
 		
 		if(!$path = config::get('validator.form.'.$form)) {
 			$path = config::get('validator.form.default');
@@ -13,9 +15,9 @@ class validator {
 
 		if($path) {
 			if(stripos($path, '::') !== false) {
-				$state->_($path);
+				$event->call($path);
 			} else {
-				$state->_($path.'::'.$form);
+				$event->call($path.'::'.$form);
 			}
 		}
 		
@@ -25,6 +27,9 @@ class validator {
 		
 	}
 	
+	static function valid() {
+		return self::$validForm;
+	}
 	
 	
 }

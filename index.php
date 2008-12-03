@@ -12,14 +12,14 @@ error_reporting(E_ALL);
 ob_start();
 include('sys/config/base.php');
 
-set_error_handler('StatefulErrorHandler');
-set_exception_handler('StatefulExceptionHandler');
+set_error_handler('triggerErrorHandler');
+set_exception_handler('triggerExceptionHandler');
 
-$stateful_bm = stateful_load_core_object('bm');
+$trigger_bm = trigger_load_core_object('bm');
 
-$stateful_bm->start('sys::all');
+$trigger_bm->start('sys::all');
 
-$state = stateful_load_core_object('state');
-$state->run();
+$event = trigger_load_core_object('event');
+$event->run();
 
 ?>

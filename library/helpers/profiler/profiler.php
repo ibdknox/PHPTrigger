@@ -155,7 +155,7 @@ class profiler {
 								$buildstring .= '<tr><td style="width: 25%; background: #DDD;">'.treat::xss($key).'</td><td style="width: 75%; background: #DDD;">'.treat::xss($value).'</td></tr>';
 						}
 					break;
-					case 'STATEMACHINE':
+					case 'eventMACHINE':
 						foreach ($values as $value) {
 							$val = (is_string($value[1]) ? treat::xss($value[1]) : '<pre>'.print_r($value[1], true).'</pre>');
 							$buildstring .= '<tr><td style="width: 25%; background: #DDD;">'.treat::xss($value[0]).'</td><td style="width: 75%; background: #DDD;">'.$val.'</td></tr>';
@@ -185,14 +185,14 @@ class profiler {
 		return "\r\n\t".$buildstring."\r\n";
 	}
 	
-	static function mergeFromState() {
-		$state = getStateObject();
+	static function mergeFromevent() {
+		$event = geteventObject();
 		
-		foreach($state->bm->marks as $mark => $info) {
+		foreach($event->bm->marks as $mark => $info) {
 			self::$marks[$mark] = $info;
 		}
 		
-		return $state;
+		return $event;
 	}
 	
 	static function addToProfile($name, $data = array()) {
@@ -200,13 +200,13 @@ class profiler {
 	}
 
 	/**
-	 * @todo add in state machine stuff
+	 * @todo add in event machine stuff
 	 */
 	static function addProfileInfo(&$file) {
 		
 		include( HELPERSDIR . '/profiler/config.php' );
 
-		$state = self::mergeFromState();
+		$event = self::mergeFromevent();
 		
 		if (config::get('profiler.display')) {
 			
@@ -220,10 +220,10 @@ class profiler {
 			self::addToProfile('get', $_GET);
 			self::addToProfile('queries', self::$queries);
 			
-			self::addToProfile('handled', $state->bm->events['handled']);
-			self::addToProfile('triggered', $state->bm->events['triggered']);
+			self::addToProfile('handled', $event->bm->events['handled']);
+			self::addToProfile('triggered', $event->bm->events['triggered']);
 			
-			$profileView = $state->view->partial('profiler', HELPERSDIR.'/profiler/views');
+			$profileView = $event->view->partial('profiler', HELPERSDIR.'/profiler/views');
 
 			$file = str_replace('</body>',$profileView."\r\n</body>",$file);
 		}

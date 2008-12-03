@@ -139,7 +139,7 @@ class ORM {
 	}
 
 	/**
-	 * Allows serialization of only the object data and state, to prevent
+	 * Allows serialization of only the object data and event, to prevent
 	 * "stale" objects being unserialized, which also requires less memory.
 	 *
 	 * @return  array

@@ -63,7 +63,7 @@ class Database_Pgsql_Driver extends Database_Driver {
 
 	public function query($sql)
 	{
-		// Only cache if it's turned on, and only cache if it's not a write statement
+		// Only cache if it's turned on, and only cache if it's not a write eventment
 		if ($this->db_config['cache'] AND ! preg_match('#\b(?:INSERT|UPDATE|SET)\b#i', $sql))
 		{
 			$hash = $this->query_hash($sql);
@@ -109,10 +109,10 @@ class Database_Pgsql_Driver extends Database_Driver {
 				// Force 'AS' to uppercase
 				$column = str_ireplace(' AS ', ' AS ', $column);
 
-				// Runs escape_column on both sides of an AS statement
+				// Runs escape_column on both sides of an AS eventment
 				$column = array_map(array($this, __FUNCTION__), explode(' AS ', $column));
 
-				// Re-create the AS statement
+				// Re-create the AS eventment
 				return implode(' AS ', $column);
 			}
 
@@ -159,7 +159,7 @@ class Database_Pgsql_Driver extends Database_Driver {
 	public function stmt_prepare($sql = '')
 	{
 		is_object($this->link) or $this->connect();
-		return new Kohana_Mysqli_Statement($sql, $this->link);
+		return new Kohana_Mysqli_eventment($sql, $this->link);
 	}
 
 	public function compile_select($database)
@@ -384,8 +384,8 @@ class Pgsql_Result extends Database_Result {
 	{
 		$this->fetch_type = ((bool) $object) ? 'pg_fetch_object' : 'pg_fetch_array';
 
-		// This check has to be outside the previous statement, because we do not
-		// know the state of fetch_type when $object = NULL
+		// This check has to be outside the previous eventment, because we do not
+		// know the event of fetch_type when $object = NULL
 		// NOTE - The class set by $type must be defined before fetching the result,
 		// autoloading is disabled to save a lot of stupid overhead.
 		if ($this->fetch_type == 'pg_fetch_object')
@@ -497,9 +497,9 @@ class Pgsql_Result extends Database_Result {
 } // End Pgsql_Result Class
 
 /**
- * PostgreSQL Prepared Statement (experimental)
+ * PostgreSQL Prepared eventment (experimental)
  */
-class Kohana_Pgsql_Statement {
+class Kohana_Pgsql_eventment {
 
 	protected $link = NULL;
 	protected $stmt;
@@ -525,13 +525,13 @@ class Kohana_Pgsql_Statement {
 		return $this;
 	}
 
-	// sets the statement values to the bound parameters
+	// sets the eventment values to the bound parameters
 	public function set_vals()
 	{
 		return $this;
 	}
 
-	// Runs the statement
+	// Runs the eventment
 	public function execute()
 	{
 		return $this;

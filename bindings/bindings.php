@@ -43,21 +43,26 @@ profiler::end('test');
 */
 
 //url listeners
-$state->register('url::/index','test::event');
-$state->register('url::/index', 'test::event2');
+$this->event->register('url::/index','test::event');
+$this->event->register('url::/index', 'test::event2');
 
-$state->register('url::/cool/test', 'test::event');
+access::restrict('/admin', array(
+								'priv' => 'admin',
+								'revert' => '/'
+							));
+
+$this->event->register('url::/cool/test', 'test::event');
 
 //form listeners
-$state->register('submit::login', 'user::login');
-$state->register('submit::login', 'test::event');
+$this->event->register('submit::login', 'user::login');
+$this->event->register('submit::login', 'test::event');
 
 
 //custom
-$state->register('kaboom', 'test::bombsquad');
+$this->event->register('kaboom', 'test::bombsquad');
 
 //sys
-$state->register('sys::preOutput', 'profiler::addProfileInfo');
-$state->register('sys::preForm', 'validator::dispatch');
+$this->event->register('sys::preOutput', 'profiler::addProfileInfo');
+$this->event->register('sys::preForm', 'validator::dispatch');
 
 ?>

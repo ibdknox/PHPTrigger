@@ -1,9 +1,12 @@
 <?php
 
-class validate extends stateful_component {
+class validate extends trigger_component {
 	
-	function logins() {
-		profiler::debug('even better');
+	function login() {
+		//profiler::debug('I would validate here');
+		if($_POST['username'] != 'awesome') {
+			validator::$validForm = false;
+		}
 	}
 	
 }

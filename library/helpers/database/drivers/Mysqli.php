@@ -14,7 +14,7 @@ class Database_Mysqli_Driver extends Database_Mysql_Driver {
 	// Database connection link
 	protected $link;
 	protected $db_config;
-	protected $statements = array();
+	protected $eventments = array();
 
 	/**
 	 * Sets the config for the class.
@@ -67,7 +67,7 @@ class Database_Mysqli_Driver extends Database_Mysql_Driver {
 
 	public function query($sql)
 	{
-		// Only cache if it's turned on, and only cache if it's not a write statement
+		// Only cache if it's turned on, and only cache if it's not a write eventment
 		if ($this->db_config['cache'] AND ! preg_match('#\b(?:INSERT|UPDATE|REPLACE|SET)\b#i', $sql))
 		{
 			$hash = $this->query_hash($sql);
@@ -94,7 +94,7 @@ class Database_Mysqli_Driver extends Database_Mysql_Driver {
 	public function stmt_prepare($sql = '')
 	{
 		is_object($this->link) or $this->connect();
-		return new Kohana_Mysqli_Statement($sql, $this->link);
+		return new Kohana_Mysqli_eventment($sql, $this->link);
 	}
 
 	public function escape_str($str)
@@ -215,8 +215,8 @@ class Kohana_Mysqli_Result extends Database_Result {
 	{
 		$this->fetch_type = ((bool) $object) ? 'fetch_object' : 'fetch_array';
 
-		// This check has to be outside the previous statement, because we do not
-		// know the state of fetch_type when $object = NULL
+		// This check has to be outside the previous eventment, because we do not
+		// know the event of fetch_type when $object = NULL
 		// NOTE - The class set by $type must be defined before fetching the result,
 		// autoloading is disabled to save a lot of stupid overhead.
 		if ($this->fetch_type == 'fetch_object')
@@ -318,9 +318,9 @@ class Kohana_Mysqli_Result extends Database_Result {
 } // End Mysqli_Result Class
 
 /**
- * MySQLi Prepared Statement (experimental)
+ * MySQLi Prepared eventment (experimental)
  */
-class Kohana_Mysqli_Statement {
+class Kohana_Mysqli_eventment {
 
 	protected $link = NULL;
 	protected $stmt;
@@ -356,7 +356,7 @@ class Kohana_Mysqli_Statement {
 		call_user_func_array(array($this->stmt, 'bind_result'), $params);
 	}
 
-	// Runs the statement
+	// Runs the eventment
 	public function execute()
 	{
 		foreach ($this->var_names as $key => $name)

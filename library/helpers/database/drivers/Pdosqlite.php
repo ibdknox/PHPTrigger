@@ -103,10 +103,10 @@ class Database_Pdosqlite_Driver extends Database_Driver {
 				// Force 'AS' to uppercase
 				$column = str_ireplace(' AS ', ' AS ', $column);
 
-				// Runs escape_column on both sides of an AS statement
+				// Runs escape_column on both sides of an AS eventment
 				$column = array_map(array($this, __FUNCTION__), explode(' AS ', $column));
 
-				// Re-create the AS statement
+				// Re-create the AS eventment
 				return implode(' AS ', $column);
 			}
 
@@ -441,9 +441,9 @@ class Pdosqlite_Result extends Database_Result {
 
 	public function seek($offset)
 	{
-		// To request a scrollable cursor for your PDOStatement object, you must
+		// To request a scrollable cursor for your PDOeventment object, you must
 		// set the PDO::ATTR_CURSOR attribute to PDO::CURSOR_SCROLL when you
-		// prepare the statement.
+		// prepare the eventment.
 		//Kohana::log('error', get_class($this).' does not support scrollable cursors, '.__FUNCTION__.' call ignored');
 
 		return FALSE;

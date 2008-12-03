@@ -1,6 +1,6 @@
 <?php
 
-class stateful_state {
+class trigger_event {
 	
 	const CLASSNAME = 0;
 	const FUNCTIONNAME = 1;
@@ -10,28 +10,18 @@ class stateful_state {
 	var $components = array();
 	var $preventTriggers = array();
 	
-	function stateful() {
-		if(isset($_SESSION['stateful::storedPost'])) {
-			$_POST = unserialize($_SESSION['stateful::storedPost']);
-			unset($_SESSION['stateful::storedPost']);
-		}
-		
-		if(isset($_SESSION['stateful::storedGet'])) {
-			$_GET = unserialize($_SESSION['stateful::storedGet']);
-			unset($_SESSION['stateful::storedGet']);
-		}
-		
+	function trigger_event() {
 		
 	}
 	
 	function run() {
-		global $stateful_bm; 
-		$this->bm =& $stateful_bm;
+		global $trigger_bm; 
+		$this->bm =& $trigger_bm;
 		
 		$this->bm->start('sys::core_load_time');
 		include( COREDIR . '/loader.php');
 				
-		$this->loader = new stateful_loader($this);		
+		$this->loader = new trigger_loader($this);		
 		$this->loader->loadCore();
 		$this->bm->end('sys::core_load_time');
 		
@@ -71,9 +61,9 @@ class stateful_state {
 		$this->trigger('sys::postRender', $file);
 		$this->bm->end('sys::view_render');
 		
-		$_SESSION['stateful::prevUrl'] = $this->requestURI;
+		$_SESSION['trigger::prevUrl'] = $this->requestURI;
 		
-		$stateful_bm->end('sys::all');
+		$trigger_bm->end('sys::all');
 		
 		$this->trigger('sys::preOutput', &$file);
 		echo $file;
@@ -89,18 +79,16 @@ class stateful_state {
 	}
 	
 	function revert() {
-		unset($_POST['formName']);
-		$_SESSION['stateful::storedPost'] = serialize($_POST);
-		$_SESSION['stateful::storedGet'] = serialize($_GET);
-		$this->trigger('sys::preRedirect');
-		$this->router->redirect($_SESSION['stateful::prevUrl']);
+		$url = $_SESSION['trigger::prevUrl'];
+		$this->trigger('sys::preRedirect', $url);
+		$this->router->redirect($url);
 	}
 	
 	function preventTrigger($path = 'all') {
 		$this->preventTriggers[$path] = true;
 	}
 	
-	function _($path, &$info = array(), $returnVal = true) {
+	function call($path, &$info = array(), $returnVal = true) {
 		$parts = $this->parseListener($path);
 		
 		if(!isset($this->components[$parts[self::CLASSNAME]])) {
@@ -158,7 +146,7 @@ class stateful_state {
 		if(isset($this->events[$event])) {
 			foreach($this->events[$event] as $listener) {
 				
-				if($this->_($listener, $info, false)) {
+				if($this->call($listener, $info, false)) {
 					$this->bm->handled($listener, $event);
 				}
 				

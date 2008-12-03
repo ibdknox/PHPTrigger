@@ -16,9 +16,9 @@ class generator implements Iterator {
 			throw new Exception('Array expected.');
 		}
 		
-		global $state;
+		global $event;
 		
-		$this->state =& $state;
+		$this->event =& $event;
 		
 		$this->mutators = array();
 		$this->position = 0;
@@ -32,7 +32,7 @@ class generator implements Iterator {
 
 		$value = $preValue;
 		foreach($this->mutators as $mut) {
-			$value = $this->state->_($mut, $value);
+			$value = $this->event->call($mut, $value);
 		}
 		
 		return $value;

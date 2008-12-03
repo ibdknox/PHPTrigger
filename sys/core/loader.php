@@ -3,10 +3,10 @@
 /**
  * 
  */
-class stateful_loader {
+class trigger_loader {
 	
-	public function __construct($state) {
-		$this->state =& $state;
+	public function __construct($event) {
+		$this->event =& $event;
 	}
 	
 	public function loadCore() {
@@ -16,7 +16,7 @@ class stateful_loader {
 							'component'
 							);
 		foreach($core_files as $file) {
-			$this->state->$file = stateful_load_core_object($file, $this->state);
+			$this->event->$file = trigger_load_core_object($file, $this->event);
 		}
 		
 		$this->config();
@@ -44,7 +44,7 @@ class stateful_loader {
 		}
 	}
 	
-	public function bindings($state) {
+	public function bindings() {
 		foreach (new DirectoryIterator(BINDINGSDIR) as $entry) {
 			if (substr($entry, strlen($entry)-4, 4) == '.php') {
 				require_once( BINDINGSDIR .'/'. $entry );

@@ -1,6 +1,6 @@
 <?php
 
-class stateful_router {
+class trigger_router {
 	
 	function route() {
 		

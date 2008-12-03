@@ -1,13 +1,13 @@
 <?php
 
-class user extends stateful_component {
+class user extends trigger_component {
 	
 	function login() {
 
-		if($_POST['username'] != 'awesome') {
+		if(!validator::valid()) {
 			//echo "failed";
-			//$this->state->preventTrigger('sys::preOutput');
-			//$this->state->revert();
+			//$this->event->preventTrigger('sys::preOutput');
+			$this->event->revert();
 		} else {
 			echo 'you tried to login!<br/>';
 			echo $this->get('test::info').'<br />';

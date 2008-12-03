@@ -1,6 +1,6 @@
 <?php
 
-class test extends stateful_component {
+class test extends trigger_component {
 	
 	function test() {
 		parent::__construct();
@@ -9,14 +9,14 @@ class test extends stateful_component {
 	}
 	
 	function event() {
-		//profiler::debug($this->state);
+		//profiler::debug($this->event);
 		$this->get('lib::lib_test::woot');
 		echo 'responding to an event<br/>';
 	}
 	
 	function event2($info) {
 		echo 'second response to "event" - with info: '.$info.'<br/>';
-		$this->state->trigger('kaboom');
+		$this->event->trigger('kaboom');
 	}
 	
 	function bombsquad() {

@@ -1,17 +1,17 @@
 <?php
 
-class stateful_view {
+class trigger_view {
 	
 	var $viewFile = '';
 	var $templateFile = '';
 	
-	function stateful_view($state) {
-		$this->state =& $state;
+	function trigger_view($event) {
+		$this->event =& $event;
 	}
 	
 	function render() {
 		
-		$this->state->trigger('sys::preViewRender');
+		$this->event->trigger('sys::preViewRender');
 		if(is_file($this->viewFile)) {
 			ob_start();
 			include($this->viewFile);
@@ -20,9 +20,9 @@ class stateful_view {
 		} else {
 			$yield =  "no view defined";
 		}
-		$this->state->trigger('sys::postViewRender', $yield);
+		$this->event->trigger('sys::postViewRender', $yield);
 		
-		$this->state->trigger('sys::preTemplateRender');
+		$this->event->trigger('sys::preTemplateRender');
 		if(is_file($this->templateFile)) {
 			ob_start();
 			include($this->templateFile);
@@ -31,7 +31,7 @@ class stateful_view {
 		} else {
 			$output = $yield;
 		}
-		$this->state->trigger('sys::postTemplateRender', $output);
+		$this->event->trigger('sys::postTemplateRender', $output);
 		
 		return $output;
 	}
@@ -60,7 +60,7 @@ class stateful_view {
 	}
 	
 	function get($path, $info = array()) {
-		return $this->state->_($path);
+		return $this->event->call($path);
 	}
 	
 }

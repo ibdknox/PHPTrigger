@@ -743,7 +743,7 @@ class Database {
 	}
 
 	/**
-	 * Compiles the select statement based on the other functions called and runs the query.
+	 * Compiles the select eventment based on the other functions called and runs the query.
 	 *
 	 * @param   string  table name
 	 * @param   string  limit clause
@@ -774,7 +774,7 @@ class Database {
 	}
 
 	/**
-	 * Compiles the select statement based on the other functions called and runs the query.
+	 * Compiles the select eventment based on the other functions called and runs the query.
 	 *
 	 * @param   string  table name
 	 * @param   array   where clause
@@ -809,7 +809,7 @@ class Database {
 	}
 
 	/**
-	 * Compiles the select statement based on the other functions called and returns the query string.
+	 * Compiles the select eventment based on the other functions called and returns the query string.
 	 *
 	 * @param   string  table name
 	 * @param   string  limit clause
@@ -1110,7 +1110,7 @@ class Database {
 	}
 
 	/**
-	 * Combine a SQL statement with the bind values. Used for safe queries.
+	 * Combine a SQL eventment with the bind values. Used for safe queries.
 	 *
 	 * @param   string  query to bind to the values
 	 * @param   array   array of values to bind to the query
@@ -1221,7 +1221,7 @@ class Database {
 	/**
 	 * Clears the query cache.
 	 *
-	 * @param   string|TRUE  clear cache by SQL statement or TRUE for last query
+	 * @param   string|TRUE  clear cache by SQL eventment or TRUE for last query
 	 * @return  Database_Core       This Database object.
 	 */
 	public function clear_cache($sql = NULL)
@@ -1243,7 +1243,7 @@ class Database {
 	}
 
 	/**
-	 * Create a prepared statement (experimental).
+	 * Create a prepared eventment (experimental).
 	 *
 	 * @param   string  SQL query
 	 * @return  object

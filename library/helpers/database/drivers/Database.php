@@ -262,7 +262,7 @@ abstract class Database_Driver {
 	abstract public function limit($limit, $offset = 0);
 
 	/**
-	 * Creates a prepared statement.
+	 * Creates a prepared eventment.
 	 *
 	 * @param   string  SQL query
 	 * @return  Database_Stmt
@@ -273,7 +273,7 @@ abstract class Database_Driver {
 	}
 
 	/**
-	 *  Compiles the SELECT statement.
+	 *  Compiles the SELECT eventment.
 	 *  Generates a query string based on which functions were used.
 	 *  Should not be called directly, the get() function calls it.
 	 *

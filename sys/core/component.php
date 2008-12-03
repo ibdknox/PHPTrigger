@@ -1,37 +1,37 @@
 <?php
 /**
  * Class designed to be extended by components created for the app and
- * simply provides a reference to the state object 
+ * simply provides a reference to the event object 
  * 
  * @author Chris Granger
  * @copyright Chris Granger 2008
  */
-class stateful_component {
+class trigger_component {
 	
 	/**
-	 * reference to the global state object 
-	 * @var stateful
+	 * reference to the global event object 
+	 * @var trigger
 	 */ 
-	public $state; 
+	public $event; 
 	
 	/**
-	 * Initializes the state object reference
+	 * Initializes the event object reference
 	 */
 	public function __construct() {
-		global $state;
-		$this->state =& $state;
+		global $event;
+		$this->event =& $event;
 	}
 	
 	/**
-	 * Alias of the stateful object's get function
+	 * Alias of the trigger object's get function
 	 * 
-	 * @uses stateful
+	 * @uses trigger
 	 * @param string $path the component path to call
 	 * @param mixed $info the parameter to send to the function
 	 * @return mixed result of the called component function
 	 */
 	public function get($path, $info = array()) {
-		return $this->state->_($path, $info);
+		return $this->event->call($path, $info);
 	}
 	
 }

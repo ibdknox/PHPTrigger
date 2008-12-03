@@ -15,23 +15,23 @@ define('SYSDIR', 'sys');
 define('CONFIGDIR', SYSDIR.'/config');
 define('COREDIR', SYSDIR.'/core');
 
-function stateful_load_core_object($name, $state = null) {
+function trigger_load_core_object($name, $event = null) {
 	include( COREDIR . "/$name.php" );
 	if(file_exists(EXTENSIONSDIR . "/$name.php")) {
 		include(EXTENSIONSDIR . "/$name.php");
 		$className = $name . '_extension';
 		if(class_exists($className)) {
-			return new $className($state);
+			return new $className($event);
 		}
 	}
-	$className = 'stateful_' . $name;
-	var_dump($state);
-	return new $className($state);
+	$className = 'trigger_' . $name;
+	var_dump($event);
+	return new $className($event);
 }
 
-function &getStateObject() {
-	global $state;
-	return $state;
+function &geteventObject() {
+	global $event;
+	return $event;
 }
 
 /**
@@ -53,7 +53,7 @@ function __autoload($class_name) {
 	
 }
 
-function StatefulErrorHandler($level, $message, $file, $line) {
+function triggerErrorHandler($level, $message, $file, $line) {
 
 	$errortype = array(
 		E_ERROR => 'Error',
@@ -95,7 +95,7 @@ function StatefulErrorHandler($level, $message, $file, $line) {
 /**
  * @todo make this actually do something.
  */
-function StatefulExceptionHandler($exception) {
+function triggerExceptionHandler($exception) {
 	
 	echo "exception thrown".$exception->getFile().$exception->getLine().$exception->getMessage();
 	//profiler::addError('Exception', $exception->getFile(), $exception->getLine(), $exception->getMessage());
