@@ -15,7 +15,7 @@ class validator {
 	
 	static function dispatch() {
 
-		$event =& geteventObject();
+		$event =& getEventObject();
 		$form = $event->postedForm();
 		
 		if(!$path = config::get('validator.form.'.$form)) {

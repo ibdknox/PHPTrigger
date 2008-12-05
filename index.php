@@ -19,7 +19,7 @@ $trigger_bm = trigger_load_core_object('bm');
 
 $trigger_bm->start('sys::all');
 
-$event = trigger_load_core_object('event');
+$event = getEventObject('event');
 $event->run();
 
 ?>

@@ -18,8 +18,7 @@ class trigger_component {
 	 * Initializes the event object reference
 	 */
 	public function __construct() {
-		global $event;
-		$this->event =& $event;
+		$this->event =& getEventObject();
 	}
 	
 	/**

@@ -186,7 +186,7 @@ class profiler {
 	}
 	
 	static function mergeFromevent() {
-		$event = geteventObject();
+		$event = getEventObject();
 		
 		foreach($event->bm->marks as $mark => $info) {
 			self::$marks[$mark] = $info;

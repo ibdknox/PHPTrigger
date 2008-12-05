@@ -3,7 +3,7 @@
 config::set('profiler.display', true);
 config::set('profiler.showErrors', true);
 
-config::set('validator.form.default', 'validate');
+config::set('validator.form.login', 'user::validateLogin');
 
 config::set('database.default', array(
 	'benchmark'     => TRUE,

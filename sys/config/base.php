@@ -16,21 +16,29 @@ define('CONFIGDIR', SYSDIR.'/config');
 define('COREDIR', SYSDIR.'/core');
 
 function trigger_load_core_object($name, $event = null) {
+	
 	include( COREDIR . "/$name.php" );
+	
 	if(file_exists(EXTENSIONSDIR . "/$name.php")) {
+		
 		include(EXTENSIONSDIR . "/$name.php");
 		$className = $name . '_extension';
 		if(class_exists($className)) {
 			return new $className($event);
 		}
+		
 	}
+
 	$className = 'trigger_' . $name;
 	var_dump($event);
 	return new $className($event);
 }
 
-function &geteventObject() {
-	global $event;
+function &getEventObject() {
+	static $event = null;
+	if($event == null) {
+		$event = trigger_load_core_object('event');
+	}
 	return $event;
 }
 
