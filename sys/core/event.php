@@ -84,6 +84,10 @@ class trigger_event {
 		$this->router->redirect($url);
 	}
 	
+	function &getComponent($class) {
+		return $this->components[$class];
+	}
+	
 	function preventTrigger($path = 'all') {
 		$this->preventTriggers[$path] = true;
 	}
@@ -92,13 +96,13 @@ class trigger_event {
 		$parts = $this->parseListener($path);
 		
 		if(!isset($this->components[$parts[self::CLASSNAME]])) {
-			$this->components[$parts[self::CLASSNAME]] = $this->loader->component($parts[self::CLASSNAME], $parts['dir']);
+			$this->components[$parts[self::CLASSNAME]] =& $this->loader->component($parts[self::CLASSNAME], $parts['dir']);
 		}
 		if(is_callable(array($this->components[$parts[self::CLASSNAME]], $parts[self::FUNCTIONNAME]))) {
 			
 			$funcName = $parts[self::FUNCTIONNAME];
 			$val = $this->components[$parts[self::CLASSNAME]]->$funcName($info);
-			
+
 			if($returnVal) {
 				return $val;
 			}
@@ -168,6 +172,12 @@ class trigger_event {
 		if($piecesCount > 2 && isset($this->componentPaths[$pieces[0]])) {
 			$type = array_shift($pieces);
 			$pieces['dir'] = $this->componentPaths[$type];
+		} else if($piecesCount > 2) {
+			$numPathParts = $piecesCount - 2;
+			$pieces['dir'] = COMPONENTDIR;
+			for($c = 0; $c < $numPathParts; $c++) {
+				$pieces['dir'] .= '/'.array_shift($pieces);
+			}
 		} else {
 			$pieces['dir'] = COMPONENTDIR;
 		}

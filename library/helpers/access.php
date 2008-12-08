@@ -2,7 +2,7 @@
 
 class access {
 	
-	static function register() {
+	static function restrict() {
 		
 		
 		

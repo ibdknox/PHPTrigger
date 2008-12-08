@@ -3,7 +3,10 @@
 config::set('profiler.display', true);
 config::set('profiler.showErrors', true);
 
-config::set('validator.form.login', 'user::validateLogin');
+config::set('unit.url', '/test');
+config::set('unit.tests', array('tests::user_test', 'tests::test_test'));
+
+config::set('validator.form.default', 'validate');
 
 config::set('database.default', array(
 	'benchmark'     => TRUE,
@@ -59,12 +62,13 @@ $this->event->register('url::/cool/test', 'test::event');
 $this->event->register('submit::login', 'user::login');
 $this->event->register('submit::login', 'test::event');
 
-
 //custom
 $this->event->register('kaboom', 'test::bombsquad');
 
 //sys
 $this->event->register('sys::preOutput', 'profiler::addProfileInfo');
 $this->event->register('sys::preForm', 'validator::dispatch');
+
+$this->event->register('url::'.config::get('unit.url'), 'unit::runUnits');
 
 ?>

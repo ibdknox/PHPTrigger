@@ -26,6 +26,7 @@ class trigger_router {
 			
 			$actualURI = '';
 			$stop = false;
+			$folder = false; 
 			
 			while ($tok !== false) {
 				
@@ -38,6 +39,7 @@ class trigger_router {
 						$actualURI .= '/'.$tok;
 						$folder = true;
 					} else {
+						$folder = true;
 						$segments[] = $tok;
 						$stop = true;
 					}
@@ -48,7 +50,7 @@ class trigger_router {
 				$tok = strtok('/');
 			}
 
-			if($actualURI == '') {
+			if($actualURI == '' && !$folder) {
 				if(!file_exists(VIEWDIR.'/index.php')) {
 					//TODO error out
 					header("HTTP/1.0 404 Not Found");
