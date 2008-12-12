@@ -10,7 +10,6 @@ class test extends trigger_component {
 	
 	function event() {
 		//profiler::debug($this->event);
-		$this->get('lib::lib_test::woot');
 		echo 'responding to an event<br/>';
 	}
 	

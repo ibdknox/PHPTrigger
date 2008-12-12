@@ -7,13 +7,11 @@ define('LAYOUTDIR', OUTPUTDIR.'/layouts');
 define('PARTIALSDIR', OUTPUTDIR.'/partials');
 define('COMPONENTDIR', 'components');
 define('BINDINGSDIR', 'bindings');
-define('LIBRARYDIR', 'library');
-define('HELPERSDIR', LIBRARYDIR.'/helpers');
-define('LIBCOMPONENTSDIR', LIBRARYDIR.'/components');
-define('EXTENSIONSDIR', LIBRARYDIR.'/extensions');
+define('HELPERSDIR', 'helpers');
 define('SYSDIR', 'sys');
 define('CONFIGDIR', SYSDIR.'/config');
 define('COREDIR', SYSDIR.'/core');
+define('EXTENSIONSDIR', SYSDIR.'/extensions');
 
 function trigger_load_core_object($name, $event = null) {
 	
