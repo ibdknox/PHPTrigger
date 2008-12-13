@@ -2,21 +2,21 @@
 
 class trigger_view {
 	
-	var $viewFile = '';
-	var $templateFile = '';
+	private $viewFile = '';
+	private $templateFile = '';
 	
-	function trigger_view($event) {
+	function __construct($event) {
 		$this->event =& $event;
 	}
 	
-	function render() {
+	public function render() {
 		
 		$this->event->trigger('sys::preViewRender');
+		
 		if(is_file($this->viewFile)) {
-			ob_start();
-			include($this->viewFile);
-			$yield = ob_get_contents();
-			ob_end_clean();
+			
+			$yield = $this->getView($this->viewFile);
+			
 		} else {
 			$yield =  "no view defined";
 		}
@@ -24,10 +24,9 @@ class trigger_view {
 		
 		$this->event->trigger('sys::preTemplateRender');
 		if(is_file($this->templateFile)) {
-			ob_start();
-			include($this->templateFile);
-			$output = ob_get_contents();
-			ob_end_clean();
+			
+			$output = $this->getView($this->templateFile, $yield);
+			
 		} else {
 			$output = $yield;
 		}
@@ -36,7 +35,22 @@ class trigger_view {
 		return $output;
 	}
 	
-	function useView($view) {
+	private function getView($file, $yield = '') {
+		ob_start();
+		include($file);
+		$result = ob_get_contents();
+		ob_end_clean();
+		
+		return $result;
+	}
+	
+	public function useView($view) {
+		
+		if( !$view  || $this->viewFile === false ) {
+			$this->viewFile = false;
+			return;
+		}
+		
 		if($view[0] == '/') {
 			$this->viewFile = VIEWDIR.$view.'.php';
 		} else {
@@ -44,22 +58,33 @@ class trigger_view {
 		}
 	}
 	
-	public function partial($name, $path = PARTIALSDIR ) {
+	public function partial($___name, $___vars = array(), $___path = PARTIALSDIR ) {
+
+		if( is_array( $___vars ) ) {
+			extract( $___vars );
+		}
 		
 		ob_start();
-		include($path.'/'.$name.'.php');
-		$partial = ob_get_contents();
+		include($___path.'/'.$___name.'.php');
+		$___partial = ob_get_contents();
 		ob_end_clean();
 		
-		return $partial;
+		return $___partial;
 		
 	}
 	
-	function useTemplate($template) {
+	public function useTemplate($template) {
+		
+		if( !$template || $this->templateFile === false ) {
+			$this->templateFile = false;
+			return;
+		}
+		
 		$this->templateFile = LAYOUTDIR.'/'.$template.'.php';
+		
 	}
 	
-	function get($path, $info = array()) {
+	public function get($path, $info = array()) {
 		return $this->event->call($path);
 	}
 	

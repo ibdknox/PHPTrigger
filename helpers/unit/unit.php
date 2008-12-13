@@ -2,11 +2,11 @@
 
 class unit_test {
 	
-	var $errors;
-	var $numtests;
-	var $failedtests;
+	public $errors;
+	public $numtests;
+	public $failedtests;
 	
-	function __construct() {
+	public function __construct() {
 		$this->event =& getEventObject();
 		$this->errors = array();
 		$this->failedtests = array();
@@ -14,7 +14,7 @@ class unit_test {
 		$this->numtests = 0;
 	}
 	
-	function run() {
+	public function run() {
 
 		$methods = get_class_methods($this);
 		foreach($methods as $m) {
@@ -34,25 +34,25 @@ class unit_test {
 		
 	}
 	
-	function assertTrue($a1) {
+	public function assertTrue($a1) {
 		if(!$a1) {
 			$this->throwError("expected true");
 		}
 	}
 
-	function assertFalse($a1) {
+	public function assertFalse($a1) {
 		if($a1) {
 			$this->throwError("expected false");
 		}
 	}
 
-	function assertEquals($a1, $a2) {
+	public function assertEquals($a1, $a2) {
 		if($a1 != $a2) {
 			$this->throwError("first value = '$a1', but '$a2' was expected");
 		}
 	}
 	
-	function throwError($msg) {
+	public function throwError($msg) {
 		$stack = debug_backtrace();
 		$curfunction = $stack[2]["function"];
 		$curline = $stack[1]["line"];
@@ -68,19 +68,36 @@ class unit {
 	static $units;
 	static $event;
 	
-	function runUnits() {
+	static function runUnits() {
 		self::$units = array();
 		self::$event =& getEventObject();
 		
-		foreach(config::get('unit.tests') as $test) {
-			self::$event->call($test.'::run');
-			$parts = explode('::', $test);
-			self::$units[$test] =& self::$event->getComponent(end($parts));
+		if(! $dir = config::get('unit.dir') ) {
+			foreach(config::get('unit.tests') as $test) {
+				self::executeTest($test);
+			}
+		} else {
+			if( stripos($dir, '::') === false ) {
+				$dir .= '::';
+			}
+			
+			$dirPath = COMPONENTDIR . '/' . str_replace('::', '/', $dir);
+			foreach (new DirectoryIterator($dirPath) as $entry) {
+				if( stripos($entry, '.php') !== false ) {
+					self::executeTest( $dir . basename($entry, '.php') );
+				}
+			}
 		}
 		self::results();
 	}
 	
-	function results() {
+	static function executeTest($test) {
+		self::$event->call($test.'::run');
+		$parts = explode('::', $test);
+		self::$units[$test] =& self::$event->getComponent(end($parts));
+	}
+	
+	static function results() {
 		$str = '';
 		foreach(self::$units as $name=>$value) {
 			$object =& self::$units[$name];

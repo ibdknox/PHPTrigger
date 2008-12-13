@@ -1,6 +1,6 @@
 <?php
 /**
- * Class designed to be extended by components created for the app and
+ * Class designed to be extended by components created for the app that
  * simply provides a reference to the event object 
  * 
  * @author Chris Granger
@@ -22,7 +22,7 @@ class trigger_component {
 	}
 	
 	/**
-	 * Alias of the trigger object's get function
+	 * Alias of the trigger object's call function
 	 * 
 	 * @uses trigger
 	 * @param string $path the component path to call

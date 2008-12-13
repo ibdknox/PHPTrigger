@@ -223,7 +223,7 @@ class profiler {
 			self::addToProfile('handled', $event->bm->events['handled']);
 			self::addToProfile('triggered', $event->bm->events['triggered']);
 			
-			$profileView = $event->view->partial('profiler', HELPERSDIR.'/profiler/views');
+			$profileView = $event->view->partial('profiler', array(), HELPERSDIR.'/profiler/views');
 
 			$file = str_replace('</body>',$profileView."\r\n</body>",$file);
 		}
