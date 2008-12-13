@@ -7,8 +7,5 @@ class access {
 		
 		
 	}
-	g
-	
-	
 	
 }
