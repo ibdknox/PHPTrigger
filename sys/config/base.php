@@ -1,10 +1,10 @@
 <?php
 
 define('FOLDER', '');
-define('OUTPUTDIR', 'output');
-define('VIEWDIR', OUTPUTDIR.'/views');
-define('LAYOUTDIR', OUTPUTDIR.'/layouts');
-define('PARTIALSDIR', OUTPUTDIR.'/partials');
+define('OUTDIR', 'out');
+define('VIEWDIR', OUTDIR.'/views');
+define('LAYOUTDIR', OUTDIR.'/layouts');
+define('PARTIALSDIR', OUTDIR.'/partials');
 define('COMPONENTDIR', 'components');
 define('BINDINGSDIR', 'bindings');
 define('HELPERSDIR', 'helpers');

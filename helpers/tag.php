@@ -20,15 +20,15 @@ class tag {
 	}
 	
 	static function img($filename, $attributes = false) {
-		return '<img src="'.FOLDER."/public/_images/$filename\" ".form::attributeString($attributes).'/>';
+		return '<img src="'.FOLDER."/assets/images/$filename\" ".form::attributeString($attributes).'/>';
 	}
 	
 	static function script($scriptname) {
-		return '<script type="text/javascript" src="'.FOLDER."/public/_js/$scriptname.js\"> </script>";
+		return '<script type="text/javascript" src="'.FOLDER."/assets/js/$scriptname.js\"> </script>";
 	}
 
 	static function style($filename, $ie7 = false) {
-		$tag = '<style type="text/css">'."@import url('".FOLDER."/public/_css/$filename.css');</style>";
+		$tag = '<style type="text/css">'."@import url('".FOLDER."/assets/css/$filename.css');</style>";
 		if($ie7) {
 			return '<!--[if IE 7]>'.$tag.'<![endif]-->';
 		} else {

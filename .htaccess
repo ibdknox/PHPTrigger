@@ -1,8 +1,8 @@
 RewriteEngine On
 Options +FollowSymLinks
 
-# Prevent the user from hitting any page other than index.php or files inside the public directory.
-RewriteCond %{REQUEST_FILENAME} !(/sys/tools/)
-RewriteCond %{REQUEST_FILENAME} !(/public/)
+RewriteRule assets/(.*) out/assets/$1
 
+# Prevent the user from hitting any page other than index.php or files inside the public directory.
+RewriteCond %{REQUEST_FILENAME} !(/out/assets/)
 RewriteRule ^.*$ index.php [NC,QSA]
