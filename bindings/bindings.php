@@ -9,25 +9,15 @@ config::set('unit.dir', 'tests');
 
 config::set('validator.form.default', 'validate');
 
-config::set('database.default', array(
-	'benchmark'     => TRUE,
-	'persistent'    => FALSE,
-	'connection'    => array
-	(
-		'type'     => 'mysql',
-		'user'     => 'root',
-		'pass'     => 'root',
-		'host'     => 'localhost',
-		'port'     => FALSE,
-		'socket'   => FALSE,
+config::set('database.config.group', 'localhost');
+config::set('database.config.localhost', array(
+		'username'     => 'root',
+		'password'     => 'root',
+		'hostname'     => 'localhost',
 		'database' => 'test'
-	),
-	'character_set' => 'utf8',
-	'table_prefix'  => '',
-	'object'        => TRUE,
-	'cache'         => FALSE,
-	'escape'        => TRUE
 ));
+
+$yes = ORM::factory('company')->where('woot = "?"', 'hell\'s')->fetch(8);
 
 /*
 class Company_Model extends orm {}
