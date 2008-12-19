@@ -17,7 +17,19 @@ config::set('database.config.localhost', array(
 		'database' => 'test'
 ));
 
-$yes = ORM::factory('company')->where('woot = "?"', 'hell\'s')->fetch(8);
+config::set('schema.company.has_one', array('companytype', 'user'));
+config::set('schema.user.has_one', array('usertype', 'email'));
+config::set('schema.email.has_one', array('emailtype'));
+config::set('schema.companytype.belongs_to_many', 'company');
+
+$yes = ORM::factory('company')->with('companytype', array('user', 'usertype', array('email', 'emailtype')))->order('user.name DESC')->fetch('massive');
+
+/*$yes = ORM::factory('company')
+							->with('companytype', 'user')
+							->where('company.name = "?"', 'woot')
+							->fetch('skookum');
+							*/
+
 
 /*
 class Company_Model extends orm {}
