@@ -31,7 +31,7 @@ class trigger_bm {
 	 *	@author Chris
 	 */
 	public function start($name) {
-		$this->marks[$name][0] = $this->microtime_float();
+		$this->marks[$name][0] = microtime(true);
 	}
 
 	/**	
@@ -41,7 +41,7 @@ class trigger_bm {
 	 *	@author Chris
 	 */
 	public function end($name) {
-		$this->marks[$name][1] = $this->microtime_float();
+		$this->marks[$name][1] = microtime(true);
 	}
 
 	/**	
@@ -75,16 +75,6 @@ class trigger_bm {
 	public function handled($handler, $trigger) {
 		$this->events['handled'][] = array($handler, $trigger);
 		
-	}
-	
-	/**	
-	 *	This utility function returns the float version of microtime()
-	 *
-	 *	@return float of current microtime
-	 */
-	public function microtime_float() {
-	    list($usec, $sec) = explode(" ", microtime());
-	    return ((float)$usec + (float)$sec);
 	}
 
 }

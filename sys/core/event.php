@@ -75,7 +75,7 @@ class trigger_event {
 	}
 	
 	function segment($num) {
-		return $this->requestSegments[$num-1];
+		return isset($this->requestSegments[$num-1]) ? $this->requestSegments[$num-1] : false;
 	}
 	
 	function revert() {
@@ -187,4 +187,3 @@ class trigger_event {
 }
 
 
-?>

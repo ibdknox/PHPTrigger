@@ -10,16 +10,16 @@ class test extends trigger_component {
 	
 	function event() {
 		//profiler::debug($this->event);
-		echo 'responding to an event<br/>';
+		//echo 'responding to an event<br/>';
 	}
 	
 	function event2($info) {
-		echo 'second response to "event" - with info: '.$info.'<br/>';
+		//echo 'second response to "event" - with info: '.$info.'<br/>';
 		$this->event->trigger('kaboom');
 	}
 	
 	function bombsquad() {
-		echo 'bomb diffused<br/>';
+		//echo 'bomb diffused<br/>';
 	}
 	
 	function info() {

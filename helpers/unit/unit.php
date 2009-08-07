@@ -5,6 +5,7 @@ class unit_test {
 	public $errors;
 	public $numtests;
 	public $failedtests;
+	private $curTestFunc;
 	
 	public function __construct() {
 		$this->event =& getEventObject();
@@ -24,6 +25,7 @@ class unit_test {
 					call_user_func(array(&$this, 'setup'), array());
 				}
 				$this->numtests++;
+				$this->curTestFunc = $m; 
 				call_user_func(array(&$this, $m), array());
 			}
 		}
@@ -55,10 +57,16 @@ class unit_test {
 	public function throwError($msg) {
 		$stack = debug_backtrace();
 		$curfunction = $stack[2]["function"];
+		
+		if($curfunction != $this->curTestFunc) {
+			//display the test name
+			$curfunction = $this->curTestFunc." ($curfunction)";
+		}
+		
 		$curline = $stack[1]["line"];
 		$this->errors[] = array("line"=>$curline, "function"=>$curfunction, "msg"=>$msg);
-		if(!in_array($curfunction, $this->failedtests)) {
-			$this->failedtests[] = $curfunction;
+		if(!in_array($this->curTestFunc, $this->failedtests)) {
+			$this->failedtests[] = $this->curTestFunc;
 		}
 	}
 }
@@ -107,7 +115,7 @@ class unit {
 				foreach($object->passedtests as $e) {
 					$str .= "<span style='padding-left:15px; color:#3b3; font:bold 110% Arial, serif;'>$e</span><br/>";
 				}
-				$str .= "}";
+				$str .= "}</br></br>";
 			} else {
 				$num = count($object->errors);
 				$passed = $object->numtests - count($object->failedtests);
@@ -118,7 +126,7 @@ class unit {
 				foreach($object->passedtests as $e) {
 					$str .= "<span style='padding-left:15px; color:#3b3; font:bold 110% Arial, serif;'>$e</span><br/>";
 				}
-				$str .= "}<br/>";
+				$str .= "}<br/></br>";
 			}
 			
 		}
