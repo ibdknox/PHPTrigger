@@ -21,6 +21,21 @@ class test extends trigger_component {
 	function bombsquad() {
 		//echo 'bomb diffused<br/>';
 	}
+
+    function ormMiniTest() {
+        
+        ORM::factory();
+
+        config::set("schema.user", array( "address" => RelTypes::HasMany, 'email' => RelTypes::HasOne, 'post' => RelTypes::HasMany ));
+        config::set("schema.address", array( "addresstype" => RelTypes::RefsOne ) );
+        config::set("schema.email", array( "type" => RelTypes::HasOne ) );
+        config::set("schema.post", array( "tag" => RelTypes::RefsMany ) );
+        config::set("schema.user_test", array( "address_test" => RelTypes::HasMany ) );
+        config::set("schema.address_test", array( "addresstype" => RelTypes::RefsMany, "state" => RelTypes::RefsOne ) );
+
+        $orm = ORM::factory()->select("user:name", "user.address:line1,city,state,zip", "user.address.addresstype:value", "user.email:address")->where("cool");
+        //profiler::debug($orm->getSQL());
+    }
 	
 	function info() {
 		return $this->agg;

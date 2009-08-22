@@ -2,6 +2,26 @@
 <ul class="posts">
     <li class="post">
         <div class="side">
+            <h1>8/21/09</h1>
+            <h2>11:33pm</h2>
+            <span>20 comments</span>
+        </div>
+        <div class="spec">
+            <p> in a while you just want something simple and easy to make, and
+            what's a better comfort food than spaghetti? That doesn't mean, though, that
+            you have to settle for something straight out of a jar. We're all adults, and
+            I think it's worth putting just a tad bit more effort into making some
+            sophisticated food. The nice part is that this won't take you any longer than
+            it normally would, but the result will be truly incomparable to prego. I'm not
+            into recipes, since I do everything by smell and taste - so I'm not going to
+            give you a recipe. Instead, I'll share with you the things I learned while
+            trying to take a "tired" dish like spaghetti and make it something to get
+            excited about again. </p>
+            <p>What should every wednesday (and every other) night include? </p><p>... Delicious homemade food.</p><p><img src="http://chris-granger.com/newsite/assets/images/dumpling/P8190876.jpg" alt="Dumpling Factory" /></p><p>And they call me the <a href="http://chris-granger.com/newsite/pics/group/dumpling">dumpling factory</a> (that's right 50+ of them).</p>
+        </div>
+    </li>
+    <li class="post">
+        <div class="side">
             <h1>7/21/09</h1>
             <h2>11:08pm</h2>
             <span>3 comments</span>

@@ -76,8 +76,11 @@ li.post { float:left; display:inline; width:100%; margin-bottom:20px; }
 li.post div.side {float: left; display: inline; width: 80px; font-family: Skia, Trebuchet MS, Verdana; }
 li.post h1 { font-size:170%; font-weight:normal; color: #9bd;}
 li.post h2 { font-size:120%; font-weight:normal; color:#579; }
+
+li.post img { max-width:500px; }
+
 body.empty {background:#0c0f12; margin-bottom:10px;}
-div.outerwrapper { padding: 50px 100px; }
+div.outerwrapper { padding: 50px 100px; margin: 0 auto; width:700px; }
 
 div.nav { float:left; display:inline; margin-left:40px;}
 div.nav ul { list-style:none; text-align:right;}
@@ -87,4 +90,4 @@ div.nav a:hover {}
 
 a.internal { color: #55b9ff; }
 
-div.navi { position: fixed; top:50%; width:10px; width:25; background:#15191f; height:90px; border: 1px solid #444; border-left:none;  }
+div.navi { display:none; position: fixed; top:50%; width:10px; width:25; background:#15191f; height:90px; border: 1px solid #444; border-left:none;  }

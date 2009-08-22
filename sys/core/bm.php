@@ -79,4 +79,3 @@ class trigger_bm {
 
 }
 
-?>

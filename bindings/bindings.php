@@ -1,6 +1,6 @@
 <?php 
 
-config::set('profiler.display', false);
+config::set('profiler.display', true);
 config::set('profiler.showErrors', true);
 
 config::set('unit.url', '/test');
@@ -20,6 +20,8 @@ access::restrict('/admin', array(
 //url listeners
 $this->event->register('url::/index','test::event');
 $this->event->register('url::/index', 'test::event2');
+
+$this->event->register('url::/lang', 'test::ormMiniTest');
 
 
 

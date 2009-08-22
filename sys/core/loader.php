@@ -53,6 +53,3 @@ class trigger_loader {
 	}
 	
 }
-
-
-?>
