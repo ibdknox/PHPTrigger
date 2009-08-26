@@ -417,7 +417,9 @@ class ORM {
 	}
 	
 	
-	public function update($object) {
+	public function update($table, $object) {
+
+        $this->_queryType = QueryTypes::Update;
 		
 		$sql = "UPDATE $this->table SET ";
 		
@@ -436,15 +438,9 @@ class ORM {
 		$sql = substr($sql, 0, -2);
 		$sql .= " WHERE $this->table.ID = '$object->ID'";
 		
-		if(!$this->sqlMode) {
-			//TODO: perform query
-		} else {
-			return $sql;
-		}
-		
 	}
 	
-	public function add($objectsToAdd) {
+	public function add($table, $objectsToAdd) {
 		
 		if( !is_array($objectsToAdd) ) {
 			
@@ -513,7 +509,7 @@ class ORM {
 		
 	}
 
-    public function getSQL() {
+    private function getSelectSQL() {
         $sql = "SELECT ";
 		
 		$sql .= $this->concatSection('selectModifiers', ' ', ' ');
@@ -547,7 +543,43 @@ class ORM {
 		}
 		
 		$this->_sql = trim($sql);
+    }
+
+    //TODO : Implement
+    private function getDeleteSQL() {
+
+    }
+
+    //TODO : Implement
+    private function getInsertSQL() {
+
+    }
+
+    //TODO : Implement
+    private function getUpdateSQL() {
+
+    }
+
+    public function getSQL() {
 		
+        switch($this->_queryType) {
+
+            case QueryTypes::Select:
+                $this->getSelectSQL();
+            break;
+
+            case QueryTypes::Delete:
+                $this->getDeleteSQL();
+            break;
+
+            case QueryTypes::Insert:
+                $this->getInsertSQL();
+            break;
+
+            case QueryTypes::Update:
+                $this->getUpdateSQL();
+            break;
+        }
 
         return $this->_sql;
     }
@@ -587,5 +619,14 @@ class JoinTypes {
     const Inner = "INNER";
     const Outer = "OUTER";
     const Right = "RIGHT";
+
+}
+
+class QueryTypes {
+
+    const Select = "Select";
+    const Delete = "Delete";
+    const Insert = "Insert";
+    const Update = "Update";
 
 }
