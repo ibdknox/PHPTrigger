@@ -3,118 +3,150 @@
 class ormSQLGeneration_test extends unit_test {
 	
 	public function setup() {
+
+        ORM::init();
 		
 		config::set('database.config.group', 'localhost');
 		config::set('database.config.localhost', array(
 				'username'     => 'root',
 				'password'     => 'root',
 				'hostname'     => 'localhost',
-				'database' => 'test'
+				'database' => '_test'
 		));
 
-		config::set('schema.company.has_one', array('companytype'));
-		config::set('schema.company.has_many', array('user'));
-		config::set('schema.company.has_and_belongs_to_many', array('category'));
-		config::set('schema.user.has_one', array('usertype', 'email'));
-		config::set('schema.email.has_one', array('emailtype'));
-		config::set('schema.companytype.belongs_to_many', 'company');
-		
-		config::set('schema.company.secondaryKey', 'name');
+        config::set("schema.user", array( "address" => RelTypes::HasMany, 'email' => RelTypes::HasOne, 'post' => RelTypes::HasMany ));
+        config::set("schema.address", array( "addresstype" => RelTypes::RefsOne ) );
+        config::set("schema.email", array( "type" => RelTypes::HasOne ) );
+        config::set("schema.post", array( "tag" => RelTypes::RefsMany ) );
+        config::set("schema.user__test", array( "address_test" => RelTypes::HasMany ) );
+        config::set("schema.address__test", array( "addresstype" => RelTypes::RefsMany, "state" => RelTypes::RefsOne ) );
 		
 	}
-	
-	public function basic_test() {
-		
-		$query = ORM::factory('company');
-		$this->assertTrue(is_object($query));
-		
-	}
-	
-	public function basicQuery_test() {
 
-		$query = ORM::factory('company')->sqlMode(true)->fetch();
-		$this->assertEquals($query, 'SELECT company.* FROM company');
-		
-	}
+    public function baseSelect_test() {
+        $cur = ORM::select("user:first");
+        $this->assertEquals($cur->getSQL(), "SELECT user.id, user.first FROM user"); 
+    }
 	
-	public function basicOrder_test() {
-		$query = ORM::factory('company')->order('company.name DESC')->sqlMode(true)->fetch();
-		$this->assertEquals($query, 'SELECT company.* FROM company ORDER BY company.name DESC');
-	}
-	
-	public function multiOrder_test() {
-		$query = ORM::factory('company')->order('company.name ASC')->order('company.ID DESC')->sqlMode(true)->fetch();
-		$this->assertEquals($query, 'SELECT company.* FROM company ORDER BY company.name ASC, company.ID DESC');
-	}
-	
-	public function basicGroup_test() {
-		$query = ORM::factory('company')->group('company.name')->sqlMode(true)->fetch();
-		$this->assertEquals($query, 'SELECT company.* FROM company GROUP BY company.name');
-	}
-	
-	public function multiGroup_test() {
-		$query = ORM::factory('company')->group('company.name')->group('company.ID')->sqlMode(true)->fetch();
-		$this->assertEquals($query, 'SELECT company.* FROM company GROUP BY company.name, company.ID');
-	}
-	
-	public function distinctQuery_test() {
-		$query = ORM::factory('company')->distinct()->sqlMode(true)->fetch();
-		$this->assertEquals($query, 'SELECT DISTINCT company.* FROM company');
-	}
-	
-	public function calcFoundQuery_test() {
-		$query = ORM::factory('company')->calcFound()->sqlMode(true)->fetch();
-		$this->assertEquals($query, 'SELECT SQL_CALC_FOUND_ROWS company.* FROM company');
-	}
-	
-	public function has_one_WithQuery_test() {
-		
-		$query = ORM::factory('company')->with('companytype')->sqlMode(true)->fetch();
-		//single join created for the many-to-one or one-to-one relationship
-		$this->assertEquals($query, 'SELECT company.*, companytype.* FROM company LEFT JOIN companytype ON company.companytype_ID = companytype.ID');
-		
-	}
-	
-	public function has_many_WithQuery_test() {
-		
-		$query = ORM::factory('company')->with('user')->sqlMode(true)->fetch();
-		//single join created for the one-to-many relationship
-		$this->assertEquals($query, 'SELECT company.*, user.* FROM company LEFT JOIN user ON company.ID = user.company_ID');
-		
-	}
-	
-	public function belongs_to_many_WithQuery_test() {
-		
-		$query = ORM::factory('companytype')->with('company')->sqlMode(true)->fetch();
-		//single join created for the one-to-many relationship
-		$this->assertEquals($query, 'SELECT companytype.*, company.* FROM companytype LEFT JOIN company ON company.companytype_ID = companytype.ID');
-		
-	}
-	
-	public function has_and_belongs_to_many_WithQuery_test() {
-		
-		$query = ORM::factory('company')->with('category')->sqlMode(true)->fetch();
-		//should use a junction table and then join through that
-		//two joins created.		
-		$this->assertEquals($query, 'SELECT company.*, category.* FROM company LEFT JOIN category_company ON company.ID = category_company.company_ID LEFT JOIN category ON category_company.category_ID = category.ID');
-		
-	}
-	
-	public function multiWith_test() {
-		$query = ORM::factory('company')->with('companytype', 'category', 'user')->sqlMode(true)->fetch();		
-		$this->assertEquals($query, 'SELECT company.*, companytype.*, category.*, user.* FROM company LEFT JOIN companytype ON company.companytype_ID = companytype.ID LEFT JOIN category_company ON company.ID = category_company.company_ID LEFT JOIN category ON category_company.category_ID = category.ID LEFT JOIN user ON company.ID = user.company_ID');
-	}
-	
-	public function nestedWith_test() {
-		$query = ORM::factory('company')->with(array('user', 'usertype'))->sqlMode(true)->fetch();		
-		$this->assertEquals($query, 'SELECT company.*, user.*, usertype.* FROM company LEFT JOIN user ON company.ID = user.company_ID LEFT JOIN usertype ON user.usertype_ID = usertype.ID');
-	}
-	
-	public function fullQuery_test() {
-		
-		$query = ORM::factory('company')->with('companytype', 'category', array('user', 'usertype', array('email', 'emailtype')))->order('user.name DESC')->calcFound()->sqlMode(true)->fetch('massive');		
-		$this->assertEquals($query, 'SELECT SQL_CALC_FOUND_ROWS company.*, companytype.*, category.*, user.*, usertype.*, email.*, emailtype.* FROM company LEFT JOIN companytype ON company.companytype_ID = companytype.ID LEFT JOIN category_company ON company.ID = category_company.company_ID LEFT JOIN category ON category_company.category_ID = category.ID LEFT JOIN user ON company.ID = user.company_ID LEFT JOIN usertype ON user.usertype_ID = usertype.ID LEFT JOIN email ON user.email_ID = email.ID LEFT JOIN emailtype ON email.emailtype_ID = emailtype.ID WHERE company.name = "massive" ORDER BY user.name DESC');
-		
-	}
+    public function multiValueSelect_test() {
+        $cur = ORM::select("user:first,last");
+        $this->assertEquals($cur->getSQL(), "SELECT user.id, user.first, user.last FROM user");
+    }
+
+    public function  Where_test() {
+        $cur = ORM::select("user:first,last")->where("user.first = '{0}'", "john");
+        $this->assertEquals($cur->getSQL(), "SELECT user.id, user.first, user.last FROM user WHERE user.first = 'john'");
+    }
+
+    public function  DefaultAndWhere_test() {
+        $cur = ORM::select("user:first,last")->where("user.first = '{0}'", "john")->where("user.last = '{0}'", "granger");
+        $this->assertEquals($cur->getSQL(), "SELECT user.id, user.first, user.last FROM user WHERE user.first = 'john' AND user.last = 'granger'");
+    }
+
+    public function  AndWhere_test() { 
+        $cur = ORM::select("user:first,last")->where("user.first = '{0}'", "john")->andWhere("user.last = '{0}'", "granger");
+        $this->assertEquals($cur->getSQL(), "SELECT user.id, user.first, user.last FROM user WHERE user.first = 'john' AND user.last = 'granger'");
+    }
+
+    public function  OrWhere_test() {
+        $cur = ORM::select("user:first,last")->where("user.first = '{0}'", "john")->orWhere("user.last = '{0}'", "granger");
+        $this->assertEquals($cur->getSQL(), "SELECT user.id, user.first, user.last FROM user WHERE user.first = 'john' OR user.last = 'granger'");
+    }
+
+    public function  Order_test() {
+        $cur = ORM::select("user:first,last")->order("user.first");
+        $this->assertEquals($cur->getSQL(), "SELECT user.id, user.first, user.last FROM user ORDER BY user.first");
+    }
+
+    public function  MultiOrder_test() {
+        $cur = ORM::select("user:first,last")->order("user.first", "user.last");
+        $this->assertEquals($cur->getSQL(), "SELECT user.id, user.first, user.last FROM user ORDER BY user.first, user.last");
+    }
+
+    public function  MultiOrderStatements_test() {
+        $cur = ORM::select("user:first,last")->order("user.first")->order("user.last");
+        $this->assertEquals($cur->getSQL(), "SELECT user.id, user.first, user.last FROM user ORDER BY user.first, user.last");
+    }
+
+    public function  Group_test() {
+        $cur = ORM::select("user:first,last")->group("user.first");
+        $this->assertEquals($cur->getSQL(), "SELECT user.id, user.first, user.last FROM user GROUP BY user.first");
+    }
+
+    public function  MultiGroup_test() {
+        $cur = ORM::select("user:first,last")->group("user.first", "user.last");
+        $this->assertEquals($cur->getSQL(), "SELECT user.id, user.first, user.last FROM user GROUP BY user.first, user.last");
+    }
+
+    public function  MultiGroupStatements_test() {
+        $cur = ORM::select("user:first,last")->group("user.first")->group("user.last");
+        $this->assertEquals($cur->getSQL(), "SELECT user.id, user.first, user.last FROM user GROUP BY user.first, user.last");
+    }
+
+    public function  Join_test() {
+        $cur = ORM::select("user:first", "user.address:line1");
+        $this->assertEquals($cur->getSQL(), "SELECT user.id, user.first, address.id, address.line1 FROM user LEFT JOIN address ON user.id = address.user_id");
+    }
+
+    public function  MultiJoin_test() {
+        $cur = ORM::select("user:first", "user.address:line1", "user.address.addresstype:value");
+        $this->assertEquals($cur->getSQL(), "SELECT user.id, user.first, address.id, address.line1, addresstype.id, addresstype.value FROM user LEFT JOIN address ON user.id = address.user_id LEFT JOIN addresstype ON address.addresstype_id = addresstype.id");
+    }
+
+    public function  Limit_test() {
+        $cur = ORM::select("user:first,last")->limit(1);
+        $this->assertEquals($cur->getSQL(), "SELECT user.id, user.first, user.last FROM user LIMIT 1");
+    }
+
+    public function  Offset_test() {
+        $cur = ORM::select("user:first,last")->offset(1);
+        $this->assertEquals($cur->getSQL(), "SELECT user.id, user.first, user.last FROM user OFFSET 1");
+    }
+
+    public function  Page_test() {
+        $cur = ORM::select("user:first,last")->limit(15)->page(2);
+        $this->assertEquals($cur->getSQL(), "SELECT user.id, user.first, user.last FROM user LIMIT 15 OFFSET 30");
+    }
+
+    public function  Star_test() {
+        $cur = ORM::select("user:*");
+        $this->assertEquals($cur->getSQL(), "SELECT user.id, user.* FROM user");
+        #TODO: building an object from this will fail epically
+    }
+
+    #_test for implicit association user.address.addresstype without user.address
+    public function  ImplicitJoin_test() {
+        $cur = ORM::select("user:first", "user.address.addresstype:value");
+        $this->assertEquals($cur->getSQL(), "SELECT user.id, user.first, addresstype.id, addresstype.value FROM user LEFT JOIN address ON user.id = address.user_id LEFT JOIN addresstype ON address.addresstype_id = addresstype.id");
+    }
+
+    #_test for incorrectly ordered children, i.e. user.address, user.email, user.address.addresstype
+    public function  IncorrectJoinOrder_test() {
+        $cur = ORM::select("user:first", "user.address:line1", "user.email:address", "user.address.addresstype:value");
+         $this->assertEquals($cur->getSQL(), "SELECT user.id, user.first, address.id, address.line1, email.id, email.address, addresstype.id, addresstype.value FROM user LEFT JOIN address ON user.id = address.user_id LEFT JOIN email ON email.user_id = user.id LEFT JOIN addresstype ON address.addresstype_id = addresstype.id");
+        #the important part is that this still builds the object correctly
+        #where this might break is in a multi, ancillary one, multi sort of situation
+    }
+
+    #explicitly _test all RelTypes
+    public function  HasMany_test() {
+        $cur = ORM::select("user.address:line1");
+        $this->assertEquals($cur->getSQL(), "SELECT address.id, address.line1 FROM user LEFT JOIN address ON user.id = address.user_id");
+    }
+
+    public function  HasOne_test() {
+        $cur = ORM::select("user.email:address");
+        $this->assertEquals($cur->getSQL(), "SELECT email.id, email.address FROM user LEFT JOIN email ON email.user_id = user.id");
+    }
+
+    public function  RefsMany_test() {
+        $cur = ORM::select("post.tag:value");
+        $this->assertEquals($cur->getSQL(), "SELECT tag.id, tag.value FROM post LEFT JOIN post_tag ON post.id = post_tag.post_id LEFT JOIN tag ON tag.id = post_tag.tag_id");
+    }
+
+    public function  RefsOne_test() {
+        $cur = ORM::select("address.addresstype:value");
+        $this->assertEquals($cur->getSQL(), "SELECT addresstype.id, addresstype.value FROM address LEFT JOIN addresstype ON address.addresstype_id = addresstype.id");
+    }
 	
 }

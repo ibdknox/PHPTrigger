@@ -3,7 +3,7 @@
 config::set('profiler.display', true);
 config::set('profiler.showErrors', true);
 
-config::set('unit.url', '/test');
+config::set('unit.url', '/__trigger__/test/orm');
 config::set('unit.dir', 'tests');
 //config::set('unit.tests', array('tests::user_test', 'tests::test_test'));
 

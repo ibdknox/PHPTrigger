@@ -14,7 +14,7 @@ class trigger_router {
 	 * 
 	 * @return array array with the requested url (view-based) at [0] and params at [1]
 	 */
-	public function route() {
+	public function route($event) {
 		
 		if (isset($_SERVER['REQUEST_URI'])) {
 			$requestURI = $_SERVER['REQUEST_URI'];
@@ -87,9 +87,16 @@ class trigger_router {
 			//if we are on a folder and params are not empty it's an invalid request
 			//params should only be attached to actual pages
 			} else if($folder && !empty($params)) {
-				header("HTTP/1.0 404 Not Found");
+                
+                //unless there's an event directly attached to this URI, it's invalid
+                if(! $event->events["url::$requestURI"] ) {
+                    header("HTTP/1.0 404 Not Found");
+                } else {
+                    $actualURI = $requestURI;
+                }
 			
 			//if we stopped on a folder, load index.php
+            //
 			} else if($folder) {
 				$actualURI .= '/index';
 			}

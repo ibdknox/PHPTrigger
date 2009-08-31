@@ -10,6 +10,7 @@ class ORM {
 	private $_order = array();
 	private $_where = array();
 	private $_joins = array();
+    private $_group = array();
     private $_modifiers = array();
 	private $_limit = 0;
 	private $_offset = 0;
@@ -24,7 +25,7 @@ class ORM {
 	private $numFound = 0;
 	
 	
-	public function __construct($table) {
+	public function __construct() {
 		
 		if( !self::$link ) {
 			self::$link = $this->connect();
@@ -32,13 +33,20 @@ class ORM {
 		
 	}
 
-    public function factory() {
-        return new ORM();
+    public function init() {
+        //loads in all the helper classes
     }
 
     public function select() {
 
         $args = func_get_args();
+        
+        if( !isset( $this->_selectOrder ) ) {
+            $cur = new ORM();
+            return call_user_func_array(array($cur, 'select'), $args);
+        }
+
+        $this->_queryType = QueryTypes::Select;
         
         foreach($args as $selection) {
             $parts = explode(":", $selection);
@@ -54,7 +62,7 @@ class ORM {
                     $this->fromTable($pathParts[0]);
                 }
 
-                if ( ! isset( $this->_selectOrder[$pathParts[0]] ) ) {
+                if ( ! in_array( $pathParts[0], $this->_selectOrder ) ) {
                     $this->_selectOrder[] = $pathParts[0];
                 }
 
@@ -62,7 +70,7 @@ class ORM {
 
             } else {
                 
-                if ( ! isset( $this->_selectOrder[$pathParts[0]] ) ) {
+                if ( ! in_array( $pathParts[0], $this->_selectOrder ) ) {
                     array_unshift( $this->_selectOrder, $pathParts[0]);
                 }
 
@@ -99,8 +107,8 @@ class ORM {
 
         if ( count( $path ) > 0 ) {
 
-            if ( ! isset( $this->_selectOrder[$path[0]] ) ) {
-                $parentIndex = array_search( $this->_selectOrder, $parent ) + 1;
+            if ( ! in_array( $path[0], $this->_selectOrder ) ) {
+                $parentIndex = array_search( $parent, $this->_selectOrder) + 1;
                 array_splice( $this->_selectOrder, $parentIndex, 0, $path[0] ); 
             }
 
@@ -110,7 +118,7 @@ class ORM {
 
         } else {
 
-            if ( ! isset( $this->_selectOrder[$parent] ) ) {
+            if ( ! in_array( $parent, $this->_selectOrder ) ) {
                 $this->_selectOrder[] = $parent;
             }
             return $parent;
@@ -160,7 +168,7 @@ class ORM {
 	
 	private function HasOne($parent, $child) {
 
-        $onClause = "$parent.id = $child.{$parent}_id";
+        $onClause = "$child.{$parent}_id = $parent.id";
         $this->join(JoinTypes::Left, $parent, $child, $onClause);
 
 	}
@@ -189,7 +197,7 @@ class ORM {
 		
         //join junction table
         $onClause = "$parent.id = $junctionTable.{$parent}_id";
-        $this->join(JoinTypes::Left, $parent, $child, $onClause);
+        $this->join(JoinTypes::Left, $parent, $junctionTable, $onClause);
 
         //join the child table
         $onClause = "$child.id = $junctionTable.{$child}_id";
@@ -208,15 +216,10 @@ class ORM {
 
         $where = array_shift($args);
 
-        $values = array();
-        if( count( $values ) > 1 ) {
-            $values = $args; 
-        }
-
-        $clause = $this->escapeClause($where, $values);
+        $clause = $this->escapeClause($where, $args);
 
         if( count( $this->_where ) > 0 ) {
-            $clause = " $type $where";  
+            $clause = " $type $clause";  
         }
 
         $this->_where[] = $clause;
@@ -237,29 +240,38 @@ class ORM {
 	}
 	
 	public function order() {
-		array_merge($this->_order, func_get_args());
+        $args = func_get_args();
+		$this->_order = array_merge($this->_order, $args);
 		return $this;
 	}
 	
 	public function group() {
-		array_merge($this->_group, func_get_args());
+        $args = func_get_args();
+		$this->_group = array_merge($this->_group, $args);
 		return $this;
 	}
 	
 	public function limit($limit) {
-		$this->limit = $limit;
+		$this->_limit = $limit;
 		return $this;
 	}
 	
 	public function offset($offset) {
-		$this->offset = $offset;
+		$this->_offset = $offset;
 		return $this;
 	}
+
+    private function wrapKeys($val) {
+        return '{'.$val.'}';
+    }
 	
     private function escapeClause($clause, $values) {
-        //TODO: make this work
-        //array walk/map escape all the values
-        //do some sort of string format
+
+        $values = array_map(array($this, 'escape'), $values); 
+        $wrappedKeys = array_map(array($this, 'wrapKeys'), array_keys($values));
+
+        $clause = str_replace($wrappedKeys, $values, $clause);
+
         return $clause;
     }
 	
@@ -272,14 +284,19 @@ class ORM {
 	}
 	
 	public function calcFound() {
-		$this->selectModifiers[] = 'SQL_CALC_FOUND_ROWS ';
+		$this->_modifiers[] = 'SQL_CALC_FOUND_ROWS ';
 		return $this;
 	}
 	
 	public function distinct() {
-		$this->selectModifiers[] = 'DISTINCT ';
+		$this->_modifiers[] = 'DISTINCT ';
 		return $this;
 	}
+
+    public function page($pageNum) {
+        $this->offset($this->_limit * $pageNum);
+        return $this;
+    }
 	
 	public function query($sql) {
 		
@@ -316,71 +333,84 @@ class ORM {
         $rootName = $this->_selectOrder[0];
 
         $prevIds = array();
-        $prevIds["rootName"] = 0;
+        $prevIds[$rootName] = 0;
         $prevObjects = array();
 
         $rowCounter = 0;
         $numRows = count($rows);
+
+        profiler::debug($this->_selectOrder);
 		
         while( $rowCounter < $numRows ) {
 
+            $fieldCounter = 0;
             $curRow = $rows[$rowCounter];
 
-            if( $prevIds[$rootName] != $curRow[0] ) {
+            if( $prevIds[$rootName] != $curRow[$fieldCounter] ) {
 
-                $rootObject = array();
-                $result[] =& $rootObject;
+                $rootObject = (object) null;
+                $result[] = $rootObject;
                 $prevIds = array();
                 $prevIds[$rootName] = $curRow[0];
-                $prevObjects[$rootName] =& $rootObject;
+                $prevObjects[$rootName] = $rootObject;
 
             }
 
             $curObjectName = $rootName;
 
-            $fieldCounter = 0;
             foreach($this->_selectOrder as $table) {
 
                 if( $table == $rootName ) {
                     $curObject = $rootObject;
                 } else {
                     if( $this->_objectRoots[$table] != $curObjectName ) {
-                        $curObject = $prevObjects[$this->_objectRoots[table]];
+                        profiler::debug($this->_objectRoots[$table]);
+                        profiler::debug($table);
+                        $curObject = $prevObjects[$this->_objectRoots[$table]];
                         $curObjectName = $this->_objectRoots[$table];
                     }
 
                     $rel = $this->getRel($curObjectName, $table);
+                    profiler::debug($table);
 
                     if( $rel == RelTypes::HasMany || $rel == RelTypes::RefsMany ) {
                         
-                        if( !isset( $curObject[$table] ) ) {
-                            $curObject[$table] = array();
+                        if( !isset( $curObject->$table ) ) {
+                            $curObject->$table = array();
                             $prevIds[$table] = 0;
                         }
 
                         if( $prevIds[$table] != $curRow[$fieldCounter] ) {
-                            $newObject = array();
-                            $curObject[$table][] =& $newObject;
-                            $curObject =& $newObject;
+                            $newArray =& $curObject->$table;
+                            $newArray[] = (object) null;
+                            $curObject = end($newArray);
+                            profiler::debug(print_r($curObject,true));
                         } else {
-                            $curObject = end($curObject[$table]);
+                            $curObject = end($curObject->$table);
                         }
-                    } else if( !isset( $table[$curObject] ) ) {
-                        $curObject[$table] = array();
-                        $curObject =& $curObject[$table];
+
+                    } else if( !isset( $curObject->$table ) ) {
+                        profiler::debug($curObject);
+                        profiler::debug($table);
+                            $curObject->$table = (object) null;
+                            $curObject = $curObject->$table;
+                        profiler::debug($curObject);
                     } else {
-                        $curObject =& $curObject[$table];
+                        $curObject = $curObject->$table;
                     }
                 }
 
                 $curObjectName = $table;
-                $prevObjects[$curObjectName] = $curObject;
                 $prevIds[$curObjectName] = $curRow[$fieldCounter];
 
                 foreach( $this->_select[$table] as $field ) {
-                    $curObject[$field] = $curRow[$fieldCounter];
+                    $curObject->$field = $curRow[$fieldCounter];
                     $fieldCounter++;
                 }
+
+                $prevObjects[$curObjectName] = $curObject;
+                profiler::debug(print_r($curObject,true));
+                profiler::debug(print_r($rootObject, true));
             }
 
             $rowCounter++;
@@ -512,16 +542,16 @@ class ORM {
     private function getSelectSQL() {
         $sql = "SELECT ";
 		
-		$sql .= $this->concatSection('selectModifiers', ' ', ' ');
+		$sql .= $this->concatSection($this->_modifiers, ' ', ' ');
 		
 		if(!empty($this->_select)) {
             foreach( $this->_select as $table => $values ) {
-                $sql .= $this->concatSection($values, "$table.", ', ').", ";
+                $sql .= $this->concatSection($values, '', ', ', "$table.").", ";
             }
             $sql = rtrim($sql, ", "); 
 		}
 		
-		$sql .= $this->concatSection('_from', ' FROM ', ', ')." ";
+		$sql .= $this->concatSection($this->_from, ' FROM ', ', ')." ";
 		
 		if( !empty( $this->_joins ) ) {
 			foreach($this->_joins as $join) {
@@ -530,16 +560,16 @@ class ORM {
 		}
         $sql = trim($sql);
 		
-		$sql .= $this->concatSection('_where', ' WHERE ');
-		$sql .= $this->concatSection('_group', ' GROUP BY ', ', ');
-		$sql .= $this->concatSection('_order', ' ORDER BY ', ', ');
+		$sql .= $this->concatSection($this->_where, ' WHERE ');
+		$sql .= $this->concatSection($this->_group, ' GROUP BY ', ', ');
+		$sql .= $this->concatSection($this->_order, ' ORDER BY ', ', ');
 		
-		if( !empty( $this->limit ) ) {
-			$sql .= " LIMIT $this->limit ";
+		if( !empty( $this->_limit ) ) {
+			$sql .= " LIMIT $this->_limit";
 		}
 		
-		if( !empty( $this->offset ) ) {
-			$sql .= " OFFSET $this->offset ";
+		if( !empty( $this->_offset ) ) {
+			$sql .= " OFFSET $this->_offset ";
 		}
 		
 		$this->_sql = trim($sql);
@@ -584,17 +614,14 @@ class ORM {
         return $this->_sql;
     }
 	
-	private function concatSection($section, $prefix = '', $separator = '') {
+	private function concatSection($section, $sectionPrefix = '', $separator = '', $valuePrefix = '') {
 		
 		$result = '';
 	    
-        if( !is_array( $section ) ) {
-            $section = $this->$section;
-        }
-
 		if( !empty( $section ) ) {
+            $result = $sectionPrefix;
 			foreach($section as $s) {
-				$result .= $prefix.$s.$separator;
+				$result .= $valuePrefix.$s.$separator;
 			}
 			
 			$result = rtrim($result, $separator);

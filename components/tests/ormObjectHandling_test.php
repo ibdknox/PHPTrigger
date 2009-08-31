@@ -3,6 +3,8 @@
 class ormObjectHandling_test extends unit_test {
 	
 	public function setup() {
+
+        ORM::init();
 		
 		config::set('database.config.group', 'localhost');
 		config::set('database.config.localhost', array(
@@ -12,79 +14,28 @@ class ormObjectHandling_test extends unit_test {
 				'database' => 'test'
 		));
 
-		config::set('schema.company.has_one', array('companytype'));
-		config::set('schema.company.has_many', array('user'));
-		config::set('schema.company.has_and_belongs_to_many', array('category'));
-		config::set('schema.user.has_one', array('usertype', 'email'));
-		config::set('schema.email.has_one', array('emailtype'));
-		config::set('schema.companytype.belongs_to_many', 'company');
+        config::set("schema.user", array( "address" => RelTypes::HasMany, 'email' => RelTypes::HasOne, 'post' => RelTypes::HasMany ));
+        config::set("schema.address", array( "addresstype" => RelTypes::RefsOne ) );
+        config::set("schema.email", array( "type" => RelTypes::HasOne ) );
+        config::set("schema.post", array( "tag" => RelTypes::RefsMany ) );
+        config::set("schema.user_test", array( "address_test" => RelTypes::HasMany ) );
+        config::set("schema.address_test", array( "addresstype" => RelTypes::RefsMany, "state" => RelTypes::RefsOne ) );
 		
-		config::set('schema.company.fields', array('ID', 'name', 'companytype_ID', 'created_ts', 'modified_ts'));
-		config::set('schema.companytype.fields', array('ID', 'value', 'created_ts', 'modified_ts'));
-		
-		config::set('schema.company.secondaryKey', 'name');
-		
+        $this->result = array(
+                    array( "1", "chris", "1", "308 108th ave ne", "1", "Home", "2", "WA"), 
+                    array( "1", "chris", "1", "308 108th ave ne", "2", "Current", "2", "WA"), 
+                    array( "1", "chris", "3", "12650 woodside falls rd", "3", "Original", "1", "NC" ),
+                    array( "2", "ryan", "4", "12650 woodside falls rd", "1", "Home", "1", "NC" ),
+                );
 	}
+    
+    public function faulty_test() {
+
+        $cur = ORM::select("user_test:first", "user_test.address_test:line1",  "user_test.address_test.state:value", "user_test.address_test.addresstype:value");
+        profiler::debug($cur->buildObject($this->result));
+        $this->assertEquals("a! woot", "awesome! woot");
+
+    }
 	
-	private function standardAssumptionForCompanyQuery($query) {
-		$this->assertTrue(is_object($query));
-		$this->assertEquals($query->count(), 2);
-		
-		$this->assertEquals($query[0]->name, 'skookum');
-		$this->assertEquals($query[1]->name, 'wrenchlabs');
-	}
-	
-	public function basic_test() {
-		
-		$query = ORM::factory('company');
-		$this->assertTrue(is_object($query));
-		
-	}
-	
-	public function basicQuery_test() {
-
-		$query = ORM::factory('company')->fetch();
-				
-		$this->standardAssumptionForCompanyQuery($query);
-	}
-	
-	public function has_one_WithQuery_test() {
-		
-		$query = ORM::factory('company')->with('companytype')->fetch();
-				
-		$this->standardAssumptionForCompanyQuery($query);
-		
-		$this->assertEquals($query[0]->companytype->value, 'small');
-		
-		
-	
-		/*
-		$query->companytype = ORM::object('companytype');
-		$query->companytype->ID = '5';
-		$query->companytype->name = 'woot';
-		/*
-		$query->ID = 3;
-		$query->name = 'chris';
-		$query->category = ORM::factory('category')->fetch('super');
-
-		$query[1] = clone $query[0];
-		$query[1]->ID = 1;
-		$query[1]->name = 'robert';
-
-
-		foreach($query as $key=>$value) {
-			profiler::debug($value);
-		}
-
-		profiler::debug($query);
-		*/
-		//$query->save();
-
-		/*$query = ORM::factory('company')
-									->with('companytype', 'user')
-									->where('company.name = "?"', 'woot')
-									->fetch('skookum');
-									*/
-	}
 	
 }
