@@ -39,4 +39,6 @@ $this->event->register('kaboom', 'test::bombsquad');
 $this->event->register('sys::preOutput', 'profiler::addProfileInfo');
 $this->event->register('sys::preForm', 'validator::dispatch');
 
-$this->event->register('url::'.config::get('unit.url'), 'unit::runUnits');
+$this->event->register('url::'.config::get('unit.url'), 'unit::runUnits'); 
+
+//$this->event->mapUrlToFolder('/__trigger__', 'sys/__trigger__');

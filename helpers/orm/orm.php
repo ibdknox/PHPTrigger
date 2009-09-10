@@ -339,7 +339,7 @@ class ORM {
         $rowCounter = 0;
         $numRows = count($rows);
 
-        profiler::debug($this->_selectOrder);
+        
 		
         while( $rowCounter < $numRows ) {
 
@@ -364,14 +364,14 @@ class ORM {
                     $curObject = $rootObject;
                 } else {
                     if( $this->_objectRoots[$table] != $curObjectName ) {
-                        profiler::debug($this->_objectRoots[$table]);
-                        profiler::debug($table);
+                        
+                        
                         $curObject = $prevObjects[$this->_objectRoots[$table]];
                         $curObjectName = $this->_objectRoots[$table];
                     }
 
                     $rel = $this->getRel($curObjectName, $table);
-                    profiler::debug($table);
+                    
 
                     if( $rel == RelTypes::HasMany || $rel == RelTypes::RefsMany ) {
                         
@@ -384,17 +384,17 @@ class ORM {
                             $newArray =& $curObject->$table;
                             $newArray[] = (object) null;
                             $curObject = end($newArray);
-                            profiler::debug(print_r($curObject,true));
+                            
                         } else {
                             $curObject = end($curObject->$table);
                         }
 
                     } else if( !isset( $curObject->$table ) ) {
-                        profiler::debug($curObject);
-                        profiler::debug($table);
+                        
+                        
                             $curObject->$table = (object) null;
                             $curObject = $curObject->$table;
-                        profiler::debug($curObject);
+                        
                     } else {
                         $curObject = $curObject->$table;
                     }
@@ -409,8 +409,8 @@ class ORM {
                 }
 
                 $prevObjects[$curObjectName] = $curObject;
-                profiler::debug(print_r($curObject,true));
-                profiler::debug(print_r($rootObject, true));
+                
+                
             }
 
             $rowCounter++;
@@ -437,40 +437,60 @@ class ORM {
 
 		$this->limitByKey($ID);
 		
-        if(!$this->sqlMode) {
-			$result = $this->query($sql);
-			return new resultObject($this->table, $result);
-		} else {
-			return $sql;
-		}
-		
+        $this->query($this->_sql);
 	}
+
+    public function delete($table, $id = null) {
+        
+        $returnObj = new ORM();
+
+        $returnObj->_queryType = QueryTypes::Delete;
+        $returnObj->_sql = "DELETE FROM $table";
+
+        if( $id != null ) {
+            $returnObj->where("$table.id = '$id'");
+        }
+
+        return $returnObj;
+
+    }
 	
 	
 	public function update($table, $object) {
 
-        $this->_queryType = QueryTypes::Update;
+        $returnObj = new ORM();
+
+        $returnObj->_queryType = QueryTypes::Update;
 		
-		$sql = "UPDATE $this->table SET ";
+		$sql = "UPDATE $table SET ";
 		
 		foreach($object as $field => $value) {
+
 			if(!is_object($value) && !is_array($value)) {
-				$sql .= "$this->table.$field = '$value', ";
-			} else {
-				
-				$parts = $this->recursiveSave($field, $value);
-				if( !empty( $parts ) ) {
-					$sql .= "$parts[fieldName] = '$parts[fieldValue]', ";
-				}
-				
-			}
+				$sql .= "$table.$field = '$value', ";
+			} else if( is_object($value) ) {
+                
+                $rel = $returnObj->getRel($table, $field);
+                if( isset($value->id) && $rel == RelTypes::HasOne) {
+                    $sql .= "$table.{$field}_id = '$value->id', ";
+                }
+
+            }
+
 		}
-		$sql = substr($sql, 0, -2);
-		$sql .= " WHERE $this->table.ID = '$object->ID'";
+		$returnObj->_sql = substr($sql, 0, -2);
+		
+        if( isset( $object->id ) ) {
+            $returnObj->where("$table.id = '$object->id'");
+        }
+
+        return $returnObj;
 		
 	}
 	
 	public function add($table, $objectsToAdd) {
+
+        $returnObj = new ORM();
 		
 		if( !is_array($objectsToAdd) ) {
 			
@@ -484,13 +504,8 @@ class ORM {
 		$fieldsString = '';
 		
 		foreach($fields as $field) {
-			if( is_object( $firstObject->$field ) || is_array( $firstObject->$field ) ) {
-				
-				$type = $this->findRelationship($this->table, $field);
-				if($type == 'has_one') {
-					$fieldsString .= "`{$field}_ID`, ";
-				}
-				
+			if( is_object( $firstObject->$field ) ) {
+                $fieldsString .= "`{$field}_id`, ";
 			} else {
 				$fieldsString .= "`$field`, ";
 			}
@@ -498,34 +513,34 @@ class ORM {
 		
 		$fieldsString = substr($fieldsString, 0, -2);
 		
-		$sql = "INSERT INTO $this->table ($fieldsString) VALUES ";
+		$sql = "INSERT INTO `$table` ($fieldsString) VALUES ";
 		foreach($objectsToAdd as $object) {
 			$sql .= "( ";
 			foreach($fields as $curField) {
 				
 				$value = $object->$curField;
 				
+                $rel = $returnObj->getRel($table, $field);
+
 				if( !is_object($value) && !is_array($value) ) {
 					$sql .= "'$value', ";
-				} else {
+				} else if ( is_object($value) && $rel == RelTypes::HasOne ) {
 
-					$parts = $this->recursiveSave($curField, $value);
-
-					if( !empty( $parts ) ) {					
-						$sql .= "'$parts[fieldValue]', ";
-					}
+                    if( isset( $value->id ) ) {
+                        $sql .= "'$value->id', ";
+                    } else {
+                        $sql .= "'0', ";
+                    }
 					
 				}
 			}
 			$sql = substr($sql, 0, -2) . ' ), ';
 		}
 		$sql = substr($sql, 0, -2);
-		
-		if(!$this->sqlMode) {
-			//TODO: perform query
-		} else {
-			return $sql;
-		}
+
+        $returnObj->_sql = $sql;
+        $returnObj->_queryType = QueryTypes::Insert;
+        return $returnObj;
 		
 	}
 
@@ -539,7 +554,7 @@ class ORM {
 		
 	}
 
-    private function getSelectSQL() {
+    private function prepareSelectSQL() {
         $sql = "SELECT ";
 		
 		$sql .= $this->concatSection($this->_modifiers, ' ', ' ');
@@ -576,18 +591,32 @@ class ORM {
     }
 
     //TODO : Implement
-    private function getDeleteSQL() {
+    private function prepareDeleteSQL() {
+
+		$this->_sql .= $this->concatSection($this->_where, ' WHERE ');
+		
+		if( !empty( $this->_limit ) ) {
+			$this->_sql .= " LIMIT $this->_limit";
+		}
 
     }
 
     //TODO : Implement
-    private function getInsertSQL() {
+    private function prepareInsertSQL() {
+
+        $this->_sql;
 
     }
 
     //TODO : Implement
-    private function getUpdateSQL() {
+    private function prepareUpdateSQL() {
 
+		$this->_sql .= $this->concatSection($this->_where, ' WHERE ');
+		
+		if( !empty( $this->_limit ) ) {
+			$this->_sql .= " LIMIT $this->_limit";
+		}
+		
     }
 
     public function getSQL() {
@@ -595,19 +624,19 @@ class ORM {
         switch($this->_queryType) {
 
             case QueryTypes::Select:
-                $this->getSelectSQL();
+                $this->prepareSelectSQL();
             break;
 
             case QueryTypes::Delete:
-                $this->getDeleteSQL();
+                $this->prepareDeleteSQL();
             break;
 
             case QueryTypes::Insert:
-                $this->getInsertSQL();
+                $this->prepareInsertSQL();
             break;
 
             case QueryTypes::Update:
-                $this->getUpdateSQL();
+                $this->prepareUpdateSQL();
             break;
         }
 

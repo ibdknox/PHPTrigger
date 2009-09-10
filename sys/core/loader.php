@@ -21,6 +21,14 @@ class trigger_loader {
 		
 		$this->config();
 	}
+
+    public function helper($path) {
+      
+       if( file_exists( HELPERSDIR . "/$path.php" ) ) {
+           include( HELPERSDIR . "/$path.php" ); 
+       }
+
+    }
 	
 	public function component($name, $path = false) {
 		
