@@ -12,6 +12,8 @@
                     $(this).text("Failed tests only");
                 }
 
+                return false;
+
             });
 
         });
