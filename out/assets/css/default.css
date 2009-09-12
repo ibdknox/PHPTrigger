@@ -1,1 +1,93 @@
-body {background:#222; color:#ccc;}
+/* Reset browser styles: get to a known state. */
+html, body, h1, h2, h3, h4, h5, h6, table, tr, th, td, form, fieldset, select, input, textarea, dl, dt, dd, ul, ol, li, address, blockquote, pre, code { margin: 0; padding: 0; }
+body { font: normal 62.5% Verdana, sans-serif; }
+h1, h2, h3, h4, h5, h6 { font-size: 100%; }
+
+a { outline: none; }
+img { border: none; }
+
+p { margin: 1em 0; }
+* html p { margin: .83333em 0; }
+
+/* Doc flow. */
+.block { display: block !important; }
+.inline { display: inline !important; }
+.left { float: left !important; display: inline !important; }
+.right { float: right !important; display: inline !important; }
+.clear { clear: both !important; }
+
+/* Margins. */
+.collapse { margin: 0 !important; }
+.first { margin-left: 0 !important; }
+.last { margin-right: 0 !important; }
+.top { margin-top: 0 !important; }
+.bottom { margin-bottom: 0 !important; }
+
+/* Site specific styles. */
+
+body { padding:0; margin:0; background: #09283D; color:#ddd; font-family: Verdana;}
+div { margin:0; padding:0;}
+div.content div { padding:15px; }
+div.content { overflow:hidden;}
+div.header {padding-top:20px; padding-bottom:0; height:50px; background:url('/assets/images/headerbg.jpg') repeat-x; margin-bottom:0;}
+div.header h1 { margin-top:15px; font-size:23pt; display:inline; float:left;}
+div.header ul {list-style:none; list-style-position:outside; font:normal 10pt Verdana; float:right; display:inline; margin-top:30px; }
+div.header ul li {float:left; display:inline; padding-left:10px; margin-left:10px; }
+div.header ul li+li {border-left:1px solid #666;}
+
+div.content div.subhead { padding:25px 20px; background: #92CC47 url('/assets/images/subheaderbg.jpg'); color:#204757; font:bold 12pt Verdana; margin:0;}
+div.subhead p {padding:0; margin:0; text-align:left; margin-top:5px;}
+div.subhead span {display:block; color:#3C6C6E; font:normal 10pt Verdana;}
+
+a { color:#75CC04; text-decoration:none; }
+
+span.date { font-weight:normal; font-size:80%; }
+
+div.content div.boxes { background:transparent; min-height:400px; padding:0; font:normal 10pt Verdana;}
+div.boxes div.one, div.boxes div.two, div.boxes div.three {min-height:400px; padding:0; padding-bottom:2000px; margin-bottom:-2000px; }
+div.boxes ul {list-style:none;}
+
+
+div.boxes .one { float:left; display:inline; width:45%; background:#204757; }
+div.boxes .one li { padding:10px; margin:10px; background:#09283D;}
+div.boxes .one li h2 { text-align:right; }
+div.boxes div.one div.admin { padding:20px; }
+div.boxes div.one div.admin textarea {width:100%; height:200px;}
+div.boxes div.one div.admin input.text {width:70%;}
+
+div.boxes .extended { width:73%; }			
+
+div.boxes .two { float:left; display:inline; background:#3C6C6E; width:27%; }
+div.boxes .two h3 { margin-left:10px; margin-top:30px; padding:5px; background:#204757; width:45%;}
+div.boxes .two ul { margin-top:10px;}
+div.boxes .two li a {display:block; padding:5px; background:#204757; margin:0 10px 2px 10px; text-align:center;}
+* html div.boxes .two li a {margin:0; padding:0;}
+div.boxes .two li a:hover { background: #09283D; }
+
+div.boxes .three { float:left; display:inline; width:28%; background:#325566;}
+div.boxes .spec {background:#061724; margin-bottom:10px;}
+
+div.spec { width:500px; margin-bottom:10px; font-size:130%; font-weight:normal; font-family:Verdana; float:left; display:inline; }
+div.spec p { margin-top: 0; }
+div.spec ul { padding-left:30px; list-style:disc; }
+div.spec ul li { margin-bottom:5px; }
+ul.posts { width: 600; float:left; display:inline; padding: 0px 0pt; }
+li.post { float:left; display:inline; width:100%; margin-bottom:20px; }
+li.post div.side {float: left; display: inline; width: 80px; font-family: Skia, Trebuchet MS, Verdana; }
+li.post h1 { font-size:170%; font-weight:normal; color: #9bd;}
+li.post h2 { font-size:120%; font-weight:normal; color:#579; }
+
+li.post img { max-width:500px; }
+
+body.empty {background:#0c0f12; margin-bottom:10px;}
+div.outerwrapper { padding: 50px 100px; margin: 0 auto; width:700px; }
+
+div.nav { float:left; display:inline; margin-left:40px;}
+div.nav ul { list-style:none; text-align:right;}
+div.nav ul li { margin-bottom:10px; }
+div.nav a { color: #55b9ff; font-size: 110%; }
+div.nav a:hover {}
+
+a.internal { color: #55b9ff; }
+
+div.navi { display:none; position: fixed; top:50%; width:10px; width:25; background:#15191f; height:90px; border: 1px solid #444; border-left:none;  }

@@ -35,4 +35,3 @@ class trigger_component {
 	
 }
 
-?>

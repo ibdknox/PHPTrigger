@@ -29,18 +29,18 @@ class trigger_event {
 		//screwing up header settings
 		ob_end_clean();
 		
+		$this->bm->start('sys::binding_time');
+		$this->loader->bindings($this);
+		$this->bm->end('sys::binding_time');
+
 		//go ahead and establish our requestURI and uri-segments
-		$routePieces = $this->router->route();
+		$routePieces = $this->router->route($this);
 		//store these
 		$this->requestURI = $routePieces[ self::REQUESTURI ];
 		$this->requestSegments = $routePieces[ self::REQUESTSEGMENTS ];
 		
 		//create a new view object
 		$this->view->useView($this->requestURI);
-		
-		$this->bm->start('sys::binding_time');
-		$this->loader->bindings($this);
-		$this->bm->end('sys::binding_time');
 		
 		if($this->postedForm()) {
 			$this->bm->start('sys::form_trigger');
@@ -75,7 +75,7 @@ class trigger_event {
 	}
 	
 	function segment($num) {
-		return $this->requestSegments[$num-1];
+		return isset($this->requestSegments[$num-1]) ? $this->requestSegments[$num-1] : false;
 	}
 	
 	function revert() {
@@ -187,4 +187,3 @@ class trigger_event {
 }
 
 
-?>

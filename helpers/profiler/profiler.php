@@ -1,5 +1,8 @@
 <?php
 
+
+include( HELPERSDIR . '/profiler/config.php');
+
 /**
  *	Used to gather time information for the profiler.
  *
@@ -81,8 +84,12 @@ class profiler {
 	 *	@author Chris
 	 */
 	static function time($name) {
-		return self::$marks[$name][1] - self::$marks[$name][0];
+		return number_format(self::$marks[$name][1] - self::$marks[$name][0], config::get('profiler.precision'));
 	}
+
+    static function removeMark($name) {
+        unset(self::$marks[$name]);
+    }
 	
 	/**
 	 * 
@@ -204,8 +211,6 @@ class profiler {
 	 */
 	static function addProfileInfo(&$file) {
 		
-		include( HELPERSDIR . '/profiler/config.php' );
-
 		$event = self::mergeFromevent();
 		
 		if (config::get('profiler.display')) {

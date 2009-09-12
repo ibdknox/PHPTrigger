@@ -13,7 +13,7 @@ class trigger_view {
 		
 		$this->event->trigger('sys::preViewRender');
 		
-		if(is_file($this->viewFile)) {
+		if(file_exists($this->viewFile)) {
 			
 			$yield = $this->getView($this->viewFile);
 			
@@ -23,7 +23,7 @@ class trigger_view {
 		$this->event->trigger('sys::postViewRender', $yield);
 		
 		$this->event->trigger('sys::preTemplateRender');
-		if(is_file($this->templateFile)) {
+		if(file_exists($this->templateFile)) {
 			
 			$output = $this->getView($this->templateFile, $yield);
 			
@@ -50,6 +50,11 @@ class trigger_view {
 			$this->viewFile = false;
 			return;
 		}
+
+        if( file_exists($view) ) {
+            $this->viewFile = $view;
+            return;
+        }
 		
 		if($view[0] == '/') {
 			$this->viewFile = VIEWDIR.$view.'.php';

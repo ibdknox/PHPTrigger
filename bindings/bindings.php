@@ -3,52 +3,12 @@
 config::set('profiler.display', true);
 config::set('profiler.showErrors', true);
 
-config::set('unit.url', '/test');
+config::set('unit.url', '/__trigger__/test/orm');
 config::set('unit.dir', 'tests');
 //config::set('unit.tests', array('tests::user_test', 'tests::test_test'));
 
 config::set('validator.form.default', 'validate');
 
-config::set('database.default', array(
-	'benchmark'     => TRUE,
-	'persistent'    => FALSE,
-	'connection'    => array
-	(
-		'type'     => 'mysql',
-		'user'     => 'root',
-		'pass'     => 'root',
-		'host'     => 'localhost',
-		'port'     => FALSE,
-		'socket'   => FALSE,
-		'database' => 'test'
-	),
-	'character_set' => 'utf8',
-	'table_prefix'  => '',
-	'object'        => TRUE,
-	'cache'         => FALSE,
-	'escape'        => TRUE
-));
-
-/*
-class Company_Model extends orm {}
-class Project_Model extends orm {}
-
-
-profiler::start('test');
-$comp = ORM::factory('company');
-
-$comp->select('value')->find(1);
-//$comp->find(2);
-
-//$projects = ORM::factory('project');
-//$projects->select('name')->find_all();
-profiler::end('test');
-//var_dump($projects);
-*/
-
-//url listeners
-$this->event->register('url::/index','test::event');
-$this->event->register('url::/index', 'test::event2');
 
 /*
 access::restrict('/admin', array(
@@ -57,11 +17,20 @@ access::restrict('/admin', array(
 							));
 							*/
 
+//url listeners
+$this->event->register('url::/index','test::event');
+$this->event->register('url::/index', 'test::event2');
+
+$this->event->register('url::/lang', 'test::ormMiniTest');
+
+
+
 $this->event->register('url::/cool/test', 'test::event');
 
 //form listeners
 $this->event->register('submit::login', 'user::login');
 $this->event->register('submit::login', 'test::event');
+
 
 //custom
 $this->event->register('kaboom', 'test::bombsquad');
@@ -70,6 +39,6 @@ $this->event->register('kaboom', 'test::bombsquad');
 $this->event->register('sys::preOutput', 'profiler::addProfileInfo');
 $this->event->register('sys::preForm', 'validator::dispatch');
 
-$this->event->register('url::'.config::get('unit.url'), 'unit::runUnits');
+$this->event->register('url::'.config::get('unit.url'), 'unit::runUnits'); 
 
-?>
+//$this->event->mapUrlToFolder('/__trigger__', 'sys/__trigger__');

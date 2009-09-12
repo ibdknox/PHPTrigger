@@ -1,6 +1,7 @@
 <?php
 
 config::set('profiler.jquery', false);
+config::set('profiler.precision', 5);
 config::set('profiler.colors', array(
 									'benchmarks'=> '#060',
 									'post'=>'#900',
